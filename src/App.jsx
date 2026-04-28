@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   TerminalSquare, ChevronRight, 
   Code, ExternalLink, Mail, User, Monitor, Gamepad2, 
-  MessageSquare, Database, LayoutDashboard, Cpu, Search, Sparkles, BrainCircuit, Loader2, FileText
+  MessageSquare, Database, LayoutDashboard, Cpu, Search, Sparkles, BrainCircuit, Loader2, FileText, X
 } from 'lucide-react';
 
 // --- CUSTOM BRAND ICONS ---
@@ -120,10 +120,13 @@ const Terminal = () => {
     { type: 'system', text: 'AffanOS v1.0.0 sürümüne hoş geldiniz.' },
     { type: 'system', text: 'Mevcut komutları görmek için "yardim" yazın. ✨ Yapay zeka ile konuşmak için "ai [soru]" yazın.' }
   ]);
-  const bottomRef = useRef(null);
+  const scrollContainerRef = useRef(null);
 
+  // Sayfayı kaydırmak yerine SADECE terminalin içini en alta kaydırıyoruz!
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
   }, [history]);
 
   const handleCommand = async (e) => {
@@ -196,7 +199,7 @@ const Terminal = () => {
           <TerminalSquare size={14} className="mr-2" /> terminal@affanccn
         </div>
       </div>
-      <div className="p-6 h-80 overflow-y-auto font-mono text-sm">
+      <div ref={scrollContainerRef} className="p-6 h-80 overflow-y-auto font-mono text-sm scroll-smooth">
         {history.map((line, i) => (
           <div key={i} className="mb-2">
             {line.type === 'user' && <span className="text-[#00F5FF]">{line.text}</span>}
@@ -217,7 +220,6 @@ const Terminal = () => {
             spellCheck="false"
           />
         </div>
-        <div ref={bottomRef} />
       </div>
     </div>
   );
@@ -239,7 +241,6 @@ const MouseTrackingMemoji = () => {
       const mouseX = e.clientX - centerX;
       const mouseY = e.clientY - centerY;
 
-      // Dönüş açılarını artırdık (daha fazla 3D hissi için 40 derece)
       const rotateX = -(mouseY / (window.innerHeight / 2)) * 40; 
       const rotateY = (mouseX / (window.innerWidth / 2)) * 40;
 
@@ -251,24 +252,16 @@ const MouseTrackingMemoji = () => {
   }, []);
 
   return (
-    // Boyutu w-32'den w-48/w-64'e çıkararak oldukça büyüttük
-    // Perspective değerini 800px yaparak derinliği artırdık
     <div className="relative w-48 h-48 md:w-64 md:h-64 mx-auto mb-10" style={{ perspective: '800px' }}>
-      {/* Arka plan parlama efekti - biraz daha yoğunlaştırıldı */}
       <div className="absolute inset-0 bg-[#00F5FF]/30 rounded-full blur-[60px] animate-pulse" />
-      
-      {/* Resim Container'ı */}
       <img 
         ref={imgRef}
         src="/images/memoji.png"
         alt="Affan Memoji"
         className="relative w-full h-full object-contain"
         style={{ 
-          // translateZ(40px) ile resmi ekrandan bize doğru "fırlatıyoruz" (Gerçek 3D)
-          // scale(1.15) ile ekstra büyütüyoruz
           transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.15) translateZ(40px)`,
           transition: 'transform 0.15s ease-out',
-          // Kusursuz bir 3D gölge efekti (Şeffaf PNG olduğunda mükemmel çalışır)
           filter: 'drop-shadow(0px 25px 30px rgba(0, 245, 255, 0.4)) drop-shadow(0px 0px 10px rgba(255, 0, 200, 0.2))'
         }}
       />
@@ -283,6 +276,7 @@ export default function App() {
   const typingText = useTypingEffect("Full-Stack Web & Unity Geliştiricisiyim");
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
   const [isHovering, setIsHovering] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null); // Popup için State
 
   // --- AI Feature States ---
   const [ideaInput, setIdeaInput] = useState('');
@@ -317,44 +311,56 @@ export default function App() {
     {
       title: "Gerçek Zamanlı Mesajlaşma",
       desc: "Socket.io kullanarak düşük gecikmeli (low-latency) anlık mesajlaşma altyapısı. MongoDB ile sohbet geçmişi modellemesi.",
-      tags: ["Node.js", "Socket.io", "MongoDB", "Tailwind"],
+      longDesc: "Kullanıcılar arası iletişim için Node.js ve Socket.io kullanarak geliştirdiğim düşük gecikmeli mesajlaşma altyapısıdır. MongoDB ile sohbet geçmişini modelledim. Projeyi Ngrok ve Vercel ile canlı ortama taşıyıp responsive (mobil uyumlu) bir arayüz entegre ettim.",
+      tags: ["Node.js", "Socket.io", "MongoDB", "Tailwind CSS"],
       icon: <MessageSquare size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#00F5FF] transition-all duration-700 drop-shadow-[0_0_15px_rgba(0,245,255,0.5)]" />,
-      image: "/images/proje1.png"
+      image: "/images/proje1.png",
+      github: "https://github.com/emrhnccn"
     },
     {
       title: "Restoran Rezervasyon Sistemi",
       desc: "Kapasite yönetimi sağlayan dinamik masa ve rezervasyon sistemi. İstemci tarafında anlık boş masa takibi.",
-      tags: ["React", "Node.js", "Express"],
+      longDesc: "Restoranlar için özel olarak geliştirilmiş kapasite yönetim sistemidir. Dinamik masa durumu ve rezervasyon takibini içerir. İstemci (müşteri) tarafında anlık boş masa takibi sağlarken, yönetici panelinde rezervasyon ve doluluk analizleri sunan güvenli bir yapı tasarladım.",
+      tags: ["React", "Node.js", "Express", "Algoritmik Planlama"],
       icon: <LayoutDashboard size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#FF00C8] transition-all duration-700 drop-shadow-[0_0_15px_rgba(255,0,200,0.5)]" />,
-      image: "/images/proje2.png"
+      image: "/images/proje2.png",
+      github: "https://github.com/emrhnccn"
     },
     {
       title: "KYK Yurt Otomasyonu",
       desc: "MySQL ile öğrenci, oda, kapasite ve yemekhane haklarını algoritmik olarak takip eden backend servisleri.",
-      tags: ["Node.js", "MySQL", "RDBMS"],
+      longDesc: "Sistem mimarisini tamamen kendim tasarladığım bir otomasyon sistemidir. MySQL kullanarak öğrenci, oda ve kapasite bilgilerini yöneten kompleks bir ilişkisel veritabanı oluşturdum. Yemekhane hakları, giriş-çıkış saatleri ve oda doluluk oranlarını algoritmik olarak takip eder.",
+      tags: ["Node.js", "MySQL", "RDBMS", "API Geliştirme"],
       icon: <Database size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#00F5FF] transition-all duration-700 drop-shadow-[0_0_15px_rgba(0,245,255,0.5)]" />,
-      image: "/images/proje3.png"
+      image: "/images/proje3.png",
+      github: "https://github.com/emrhnccn"
     },
     {
       title: "3D Co-op Bulmaca Oyunu",
       desc: "İki oyuncunun eşzamanlı etkileşimine dayalı 3D bulmaca mekanikleri. Rigidbody fiziği ile bellek optimizasyonu.",
-      tags: ["Unity 3D", "C#", "Clean Code"],
+      longDesc: "İki oyuncunun (Co-op) eşzamanlı etkileşimine dayalı 3D bulmaca mekanikleri içeren Unity oyunumdur. Karakterler arası veri senkronizasyonu sağlandı. Rigidbody fiziği ve Raycast etkileşimleri kullanılarak Clean Code (temiz kod) prensipleriyle bellek optimizasyonu yapıldı.",
+      tags: ["Unity 3D", "C#", "Level Design", "Fizik Motoru"],
       icon: <Gamepad2 size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#FF00C8] transition-all duration-700 drop-shadow-[0_0_15px_rgba(255,0,200,0.5)]" />,
-      image: "/images/proje4.png"
+      image: "/images/proje4.png",
+      github: "https://github.com/emrhnccn"
     },
     {
       title: "Kampüs Temalı Match-3",
       desc: "Blender ile 3D/2D modellenmiş binalar, grid tabanlı Match-3 algoritmaları ve API senkronizasyonlu Leaderboard.",
-      tags: ["Unity", "C#", "Blender"],
+      longDesc: "Üniversite bitirme projem olarak hazırladığım Kampüs temalı Match-3 oyunu. Blender ile kampüs binalarını modelleyip Unity'ye dinamik level haritası olarak entegre ettim. C# ile grid tabanlı Match-3 algoritmaları yazdım ve API üzerinden veri senkronizasyonu sağlayan Leaderboard (Liderlik Tablosu) kurdum.",
+      tags: ["Unity", "C#", "Blender", "Backend API"],
       icon: <Monitor size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#00F5FF] transition-all duration-700 drop-shadow-[0_0_15px_rgba(0,245,255,0.5)]" />,
-      image: "/images/proje5.png"
+      image: "/images/proje5.png",
+      github: "https://github.com/emrhnccn"
     },
     {
       title: "AI & Veri Otomasyonları",
       desc: "LLM API entegrasyonuyla dinamik içerik üretimi ve Web Scraping ile operasyonel verimliliği artıran scriptler.",
-      tags: ["LLM API", "Node.js", "Scraping"],
+      longDesc: "Ar-Ge projelerim kapsamında geliştirdiğim otomasyon sistemleri. LLM (Yapay Zeka API'leri) entegrasyonuyla dinamik içerik üreten sistemler ve Web Scraping (Veri Kazıma) ile internetten veri toplayan botlar tasarladım. Tekrarlayan görevleri otomatize ederek süreçleri hızlandırır.",
+      tags: ["LLM API", "Node.js", "Web Scraping", "Otomasyon"],
       icon: <Cpu size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#FF00C8] transition-all duration-700 drop-shadow-[0_0_15px_rgba(255,0,200,0.5)]" />,
-      image: "/images/proje6.png"
+      image: "/images/proje6.png",
+      github: "https://github.com/emrhnccn"
     }
   ];
 
@@ -382,14 +388,14 @@ export default function App() {
 
       {/* Custom Cursor */}
       <div 
-        className="fixed top-0 left-0 w-8 h-8 rounded-full border-2 border-[#00F5FF] pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-100 ease-out mix-blend-screen"
+        className="fixed top-0 left-0 w-8 h-8 rounded-full border-2 border-[#00F5FF] pointer-events-none z-[100] transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-100 ease-out mix-blend-screen"
         style={{ 
           transform: `translate(${cursorPos.x}px, ${cursorPos.y}px) scale(${isHovering ? 1.5 : 1})`,
           boxShadow: isHovering ? '0 0 20px #00F5FF' : '0 0 10px rgba(0,245,255,0.5)'
         }}
       />
       <div 
-        className="fixed top-0 left-0 w-1 h-1 bg-[#FF00C8] rounded-full pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2"
+        className="fixed top-0 left-0 w-1 h-1 bg-[#FF00C8] rounded-full pointer-events-none z-[100] transform -translate-x-1/2 -translate-y-1/2"
         style={{ transform: `translate(${cursorPos.x}px, ${cursorPos.y}px)` }}
       />
 
@@ -481,15 +487,28 @@ export default function App() {
                 onMouseLeave={() => setIsHovering(false)}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-[#00F5FF] to-[#FF00C8] rounded-xl blur-xl opacity-30 group-hover:opacity-80 transition-all duration-500 group-hover:scale-105"></div>
+                
+                {/* CV ÖNİZLEME (PREVIEW) BÖLÜMÜ */}
                 <div className="relative aspect-square rounded-xl bg-[#111] border border-white/10 overflow-hidden flex flex-col items-center justify-center transition-transform duration-500 group-hover:scale-105 shadow-2xl">
-                   <FileText size={80} className="text-gray-600 group-hover:scale-110 group-hover:text-[#00F5FF] transition-all duration-500 mb-6 relative z-10" />
+                   
+                   {/* Iframe ile PDF arkada flu olarak gösteriliyor */}
+                   <iframe 
+                      src="/affanCV11.pdf#toolbar=0&navpanes=0&scrollbar=0" 
+                      className="absolute inset-0 w-full h-full pointer-events-none opacity-40 group-hover:opacity-60 transition-opacity duration-500 object-cover" 
+                      title="CV Preview"
+                   ></iframe>
+                   
+                   {/* Siyah Karartma ve Gradyan */}
+                   <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-[#0D0D0D]/60 to-transparent opacity-90 group-hover:opacity-70 transition-all duration-500" />
+                   
+                   {/* Ön Plandaki Yazı ve İkonlar */}
+                   <FileText size={80} className="text-gray-300 group-hover:scale-110 group-hover:text-[#00F5FF] transition-all duration-500 mb-6 relative z-10 drop-shadow-[0_0_15px_rgba(0,245,255,0.5)]" />
                    <div className="text-center relative z-10">
-                      <p className="text-white font-bold text-2xl mb-3 group-hover:text-[#00F5FF] transition-colors tracking-wide">Özgeçmiş (CV)</p>
-                      <p className="text-[#FF00C8] font-mono text-sm flex items-center justify-center gap-2 bg-[#FF00C8]/10 px-4 py-2 rounded-full border border-[#FF00C8]/20 group-hover:bg-[#00F5FF]/10 group-hover:text-[#00F5FF] group-hover:border-[#00F5FF]/20 transition-all">
+                      <p className="text-white font-bold text-2xl mb-3 group-hover:text-[#00F5FF] transition-colors tracking-wide drop-shadow-md">Özgeçmiş (CV)</p>
+                      <p className="text-[#FF00C8] font-mono text-sm flex items-center justify-center gap-2 bg-[#FF00C8]/10 px-4 py-2 rounded-full border border-[#FF00C8]/20 group-hover:bg-[#00F5FF]/10 group-hover:text-[#00F5FF] group-hover:border-[#00F5FF]/20 transition-all backdrop-blur-sm">
                         İncelemek için tıkla <ExternalLink size={16} />
                       </p>
                    </div>
-                   <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-transparent to-transparent opacity-80" />
                 </div>
               </a>
             </SectionItem>
@@ -545,8 +564,11 @@ export default function App() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-32">
             {projectsData.map((project, index) => (
               <SectionItem key={index} delay={index * 150}>
+                
+                {/* PROJE KARTI (Tıklanabilir yapıldı) */}
                 <div 
-                  className="group relative h-full flex flex-col bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-[#00F5FF]/50 hover:shadow-[0_0_25px_rgba(0,245,255,0.15)] transition-all duration-500"
+                  onClick={() => setSelectedProject(project)}
+                  className="group relative h-full flex flex-col bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-[#00F5FF]/50 hover:shadow-[0_0_25px_rgba(0,245,255,0.15)] transition-all duration-500 cursor-none"
                   onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}
                 >
                   <div className="h-48 bg-[#111] relative overflow-hidden flex items-center justify-center">
@@ -562,8 +584,16 @@ export default function App() {
                   </div>
                   <div className="p-6 flex-1 flex flex-col relative z-10 bg-[#050505]">
                     <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-bold group-hover:text-[#00F5FF] transition-colors">{project.title}</h3>
-                      <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                      <h3 className="text-xl font-bold group-hover:text-[#00F5FF] transition-colors pr-4">{project.title}</h3>
+                      
+                      {/* GitHub İkonu (Projeyi açmadan direkt GitHub'a gider) */}
+                      <a 
+                        href={project.github} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        onClick={(e) => e.stopPropagation()} 
+                        className="text-gray-400 hover:text-white transition-colors"
+                      >
                         <GithubIcon size={20} />
                       </a>
                     </div>
@@ -605,14 +635,14 @@ export default function App() {
                     value={ideaInput}
                     onChange={(e) => setIdeaInput(e.target.value)}
                     placeholder="Örn: E-ticaret siteleri için müşteri tutma..."
-                    className="flex-1 bg-white/5 border border-white/10 focus:border-[#00F5FF] focus:ring-1 focus:ring-[#00F5FF] rounded-lg px-6 py-4 text-white outline-none transition-all"
+                    className="flex-1 bg-white/5 border border-white/10 focus:border-[#00F5FF] focus:ring-1 focus:ring-[#00F5FF] rounded-lg px-6 py-4 text-white outline-none transition-all cursor-none"
                     onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}
                   />
                   <button
                     onClick={handleGenerateIdea}
                     disabled={isGeneratingIdea}
                     onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}
-                    className="bg-[#00F5FF] text-[#0D0D0D] px-8 py-4 rounded-lg font-bold hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px]"
+                    className="bg-[#00F5FF] text-[#0D0D0D] px-8 py-4 rounded-lg font-bold hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px] cursor-none"
                   >
                     {isGeneratingIdea ? <Loader2 className="animate-spin" /> : <><Sparkles size={18} /> Fikir Üret</>}
                   </button>
@@ -640,18 +670,80 @@ export default function App() {
           </div>
           
           <div className="flex gap-6">
-            <a href="https://github.com/emrhnccn" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#00F5FF] transition-colors" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+            <a href="https://github.com/emrhnccn" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#00F5FF] transition-colors cursor-none" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
               <GithubIcon size={22} />
             </a>
-            <a href="https://linkedin.com/in/affanccn" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#FF00C8] transition-colors" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+            <a href="https://linkedin.com/in/affanccn" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#FF00C8] transition-colors cursor-none" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
               <LinkedinIcon size={22} />
             </a>
-            <a href="mailto:emrhn.ccn@gmail.com" className="text-gray-400 hover:text-[#00F5FF] transition-colors" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+            <a href="mailto:emrhn.ccn@gmail.com" className="text-gray-400 hover:text-[#00F5FF] transition-colors cursor-none" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
               <Mail size={22} />
             </a>
           </div>
         </div>
       </footer>
+
+      {/* --- PROJE DETAY POPUP (MODAL) --- */}
+      {selectedProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Arka plan karartması - Tıklanınca modülü kapatır */}
+          <div 
+            className="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer" 
+            onClick={() => setSelectedProject(null)}
+            onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}
+          ></div>
+          
+          {/* Modal İçeriği */}
+          <div className="relative bg-[#050505] border border-white/10 rounded-2xl w-full max-w-3xl overflow-hidden shadow-[0_0_50px_rgba(0,245,255,0.15)] animate-in fade-in zoom-in-95 duration-300 z-10 flex flex-col max-h-[90vh]">
+             
+             {/* Kapat Butonu */}
+             <button 
+                onClick={() => setSelectedProject(null)} 
+                className="absolute top-4 right-4 z-20 p-2 bg-black/50 hover:bg-red-500/80 rounded-full text-white transition-colors cursor-none"
+                onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}
+             >
+               <X size={20} />
+             </button>
+             
+             {/* Resim & Başlık Bölümü */}
+             <div className="h-64 relative flex-shrink-0">
+               <img src={selectedProject.image} alt={selectedProject.title} className="w-full h-full object-cover opacity-60" />
+               <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent"></div>
+               <div className="absolute bottom-6 left-6 flex items-center gap-4">
+                  <div className="p-3 bg-black/50 backdrop-blur-md rounded-xl border border-white/10 text-white">
+                    {selectedProject.icon}
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-white drop-shadow-md">{selectedProject.title}</h2>
+               </div>
+             </div>
+             
+             {/* Detay & Buton Bölümü */}
+             <div className="p-8 overflow-y-auto">
+               <h3 className="text-[#00F5FF] font-mono text-sm mb-4">Proje Detayları_</h3>
+               <p className="text-gray-300 leading-relaxed mb-8 text-lg">{selectedProject.longDesc}</p>
+               
+               <div className="flex flex-wrap gap-2 mb-8">
+                  {selectedProject.tags.map(tag => (
+                    <span key={tag} className="text-sm font-mono text-[#FF00C8] bg-[#FF00C8]/10 px-3 py-1 rounded border border-[#FF00C8]/20">{tag}</span>
+                  ))}
+               </div>
+               
+               {/* GitHub'a Git Butonu */}
+               <div className="flex">
+                  <a 
+                    href={selectedProject.github} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="flex-1 bg-[#00F5FF]/10 hover:bg-[#00F5FF] border border-[#00F5FF]/50 text-[#00F5FF] hover:text-[#0D0D0D] px-6 py-4 rounded-lg font-bold transition-all flex items-center justify-center gap-3 cursor-none shadow-[0_0_15px_rgba(0,245,255,0.2)] hover:shadow-[0_0_30px_rgba(0,245,255,0.6)]"
+                    onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}
+                  >
+                     <GithubIcon size={24} /> Projeyi GitHub'da İncele
+                  </a>
+               </div>
+             </div>
+          </div>
+        </div>
+      )}
       
     </div>
   );
