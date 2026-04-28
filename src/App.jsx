@@ -6,7 +6,6 @@ import {
 } from 'lucide-react';
 
 // --- CUSTOM BRAND ICONS ---
-// Lucide-react marka ikonlarını kaldırdığı için Github ve Linkedin ikonlarımızı manuel SVG olarak ekliyoruz.
 const GithubIcon = ({ size = 24, className = "" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 8 18v4"></path>
@@ -52,7 +51,6 @@ const callGeminiAPI = async (prompt, systemInstruction) => {
 
 // --- CUSTOM HOOKS ---
 
-// 1. Typing Effect Hook
 const useTypingEffect = (text, typingSpeed = 100, deletingSpeed = 50, pauseDuration = 2000) => {
   const [displayedText, setDisplayedText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -78,7 +76,6 @@ const useTypingEffect = (text, typingSpeed = 100, deletingSpeed = 50, pauseDurat
   return displayedText;
 };
 
-// 2. Scroll Fade-in Hook
 const useScrollFadeIn = () => {
   const domRef = useRef();
   const [isVisible, setVisible] = useState(false);
@@ -236,17 +233,15 @@ const MouseTrackingMemoji = () => {
     const handleMouseMove = (e) => {
       if (!imgRef.current) return;
       const rect = imgRef.current.getBoundingClientRect();
-      // Görselin merkezini hesapla
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
       
-      // Fare ile merkez arasındaki farkı bul
       const mouseX = e.clientX - centerX;
       const mouseY = e.clientY - centerY;
 
-      // X ve Y eksenindeki dönüş açılarını sınırla (max 30 derece)
-      const rotateX = -(mouseY / (window.innerHeight / 2)) * 30; 
-      const rotateY = (mouseX / (window.innerWidth / 2)) * 30;
+      // Dönüş açılarını artırdık (daha fazla 3D hissi için 40 derece)
+      const rotateX = -(mouseY / (window.innerHeight / 2)) * 40; 
+      const rotateY = (mouseX / (window.innerWidth / 2)) * 40;
 
       setTilt({ x: rotateX, y: rotateY });
     };
@@ -256,17 +251,25 @@ const MouseTrackingMemoji = () => {
   }, []);
 
   return (
-    <div className="relative w-32 h-32 md:w-40 md:h-40 mx-auto mb-6" style={{ perspective: '1000px' }}>
-      {/* Arka plan parlama efekti */}
-      <div className="absolute inset-0 bg-[#00F5FF]/20 rounded-full blur-2xl animate-pulse" />
+    // Boyutu w-32'den w-48/w-64'e çıkararak oldukça büyüttük
+    // Perspective değerini 800px yaparak derinliği artırdık
+    <div className="relative w-48 h-48 md:w-64 md:h-64 mx-auto mb-10" style={{ perspective: '800px' }}>
+      {/* Arka plan parlama efekti - biraz daha yoğunlaştırıldı */}
+      <div className="absolute inset-0 bg-[#00F5FF]/30 rounded-full blur-[60px] animate-pulse" />
+      
+      {/* Resim Container'ı */}
       <img 
         ref={imgRef}
         src="/images/memoji.png"
         alt="Affan Memoji"
-        className="relative w-full h-full object-contain drop-shadow-[0_0_15px_rgba(0,245,255,0.4)]"
+        className="relative w-full h-full object-contain"
         style={{ 
-          transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.1)`,
-          transition: 'transform 0.1s ease-out' // Yumuşak bir takip hissi için
+          // translateZ(40px) ile resmi ekrandan bize doğru "fırlatıyoruz" (Gerçek 3D)
+          // scale(1.15) ile ekstra büyütüyoruz
+          transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.15) translateZ(40px)`,
+          transition: 'transform 0.15s ease-out',
+          // Kusursuz bir 3D gölge efekti (Şeffaf PNG olduğunda mükemmel çalışır)
+          filter: 'drop-shadow(0px 25px 30px rgba(0, 245, 255, 0.4)) drop-shadow(0px 0px 10px rgba(255, 0, 200, 0.2))'
         }}
       />
     </div>
