@@ -501,7 +501,7 @@ export default function App() {
                 </h3>
               </SectionItem>
               <SectionItem delay="300">
-                <h2 className="text-4xl font-bold">Gerçek Zamanlı Sistemler & Oyun Mekanikleri.</h2>
+                <h2 className="text-4xl font-bold">Affan Emirhan Çüçen Kimdir?</h2>
               </SectionItem>
               <SectionItem delay="400">
                 <p className="text-gray-400 leading-relaxed text-lg">
