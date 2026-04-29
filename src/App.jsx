@@ -23,30 +23,49 @@ const LinkedinIcon = ({ size = 24, className = "" }) => (
 // --- GEMINI API HELPER ---
 const apiKey = "AIzaSyBPp2c66qC8GLAs2KYEshRTz-P6KXAJbOM";
 const callGeminiAPI = async (prompt, systemInstruction) => {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-  const payload = {
-    contents: [{ parts: [{ text: prompt }] }],
-    systemInstruction: { parts: [{ text: systemInstruction }] }
-  };
-
+  // 404 gibi bulunamama durumlarına karşı Google'ın güncel modellerini sırayla dener.
+  const modelsToTry = ["gemini-1.5-flash-latest", "gemini-1.5-flash", "gemini-pro"];
   const delay = (ms) => new Promise(res => setTimeout(res, ms));
-  const retries = [1000, 2000, 4000, 8000, 16000];
+  const retries = [1000, 2000, 4000];
 
-  for (let attempt = 0; attempt <= retries.length; attempt++) {
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!response.ok) throw new Error('API Hatası');
-      const result = await response.json();
-      return result.candidates?.[0]?.content?.parts?.[0]?.text || "Yanıt alınamadı.";
-    } catch (error) {
-      if (attempt === retries.length) throw error;
-      await delay(retries[attempt]);
+  for (const model of modelsToTry) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    
+    const payload = {
+      contents: [{ parts: [{ text: prompt }] }],
+    };
+    
+    // Eski modeller systemInstruction desteklemediği için sadece 1.5 sürümünde bunu ekliyoruz.
+    if (model.includes("1.5")) {
+      payload.systemInstruction = { parts: [{ text: systemInstruction }] };
+    }
+
+    for (let attempt = 0; attempt <= retries.length; attempt++) {
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        // Eğer model bulunamazsa (404), döngüyü kırıp hemen listedeki diğer modele geç.
+        if (response.status === 404) {
+          break; 
+        }
+        
+        if (!response.ok) throw new Error(`API Hatası: ${response.status}`);
+        
+        const result = await response.json();
+        return result.candidates?.[0]?.content?.parts?.[0]?.text || "Yanıt alınamadı.";
+      } catch (error) {
+        if (attempt === retries.length) {
+           break;
+        }
+        await delay(retries[attempt]);
+      }
     }
   }
+  return "AI modeline şu an ulaşılamıyor, lütfen daha sonra tekrar deneyin.";
 };
 
 // --- CUSTOM HOOKS ---
@@ -520,7 +539,7 @@ export default function App() {
                 </h3>
               </SectionItem>
               <SectionItem delay="300">
-                <h2 className="text-4xl font-bold">Affan Emirhan Çüçen Kimdir?</h2>
+                <h2 className="text-4xl font-bold">Gerçek Zamanlı Sistemler & Oyun Mekanikleri.</h2>
               </SectionItem>
               <SectionItem delay="400">
                 <p className="text-gray-400 leading-relaxed text-lg">
