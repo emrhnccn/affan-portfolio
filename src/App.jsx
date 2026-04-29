@@ -23,7 +23,7 @@ const LinkedinIcon = ({ size = 24, className = "" }) => (
 // --- CLAUDE API HELPER ---
 const callClaudeAPI = async (prompt, systemInstruction) => {
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("/api/claude", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -34,7 +34,7 @@ const callClaudeAPI = async (prompt, systemInstruction) => {
       })
     });
 
-    if (!response.ok) throw new Error(`API Hatası: ${response.status}`);
+    if (!response.ok) throw new Error(`Hata: ${response.status}`);
     const data = await response.json();
     return data.content?.[0]?.text || "Yanıt alınamadı.";
   } catch (error) {
