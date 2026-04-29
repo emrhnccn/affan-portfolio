@@ -21,27 +21,46 @@ const LinkedinIcon = ({ size = 24, className = "" }) => (
 );
 
 // --- GEMINI API HELPER ---
+const getApiKey = () => {
+  try {
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_GEMINI_API_KEY) {
+      return import.meta.env.VITE_GEMINI_API_KEY;
+    }
+  } catch(e) {}
+  return "";
+};
+const apiKey = getApiKey();
+
 const callGeminiAPI = async (prompt, systemInstruction) => {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  if (!apiKey) return "API Anahtarı bulunamadı. Lütfen Vercel ortam değişkenlerini kontrol edin.";
+
+  // Kullanıcının listesindeki güncel gemini-2.5-flash modeline geçirildi
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
   
   const payload = {
-    systemInstruction: { parts: [{ text: systemInstruction }] },
     contents: [{ parts: [{ text: prompt }] }],
+    systemInstruction: { parts: [{ text: systemInstruction }] }
   };
 
-  // Sadece 1 deneme, retry yok — rate limit'i tetikleme
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-
-  if (!response.ok) {
-    throw new Error(`API Hatası: ${response.status}`);
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("API Hatası Detayı:", errorText);
+      throw new Error(`API Hatası: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    return result.candidates?.[0]?.content?.parts?.[0]?.text || "Yanıt alınamadı.";
+  } catch (error) {
+    console.error("Bağlantı Hatası:", error);
+    return "Yapay zeka sistemine şu an bağlanılamıyor. Lütfen daha sonra tekrar deneyin.";
   }
-
-  const result = await response.json();
-  return result.candidates?.[0]?.content?.parts?.[0]?.text || "Yanıt alınamadı.";
 };
 
 // --- CUSTOM HOOKS ---
@@ -271,7 +290,7 @@ export default function App() {
   const typingText = useTypingEffect("Full-Stack Web & Unity Geliştiricisiyim");
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
   const [isHovering, setIsHovering] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(null); // Popup için State
+  const [selectedProject, setSelectedProject] = useState(null);
 
   // --- AI Feature States ---
   const [ideaInput, setIdeaInput] = useState('');
@@ -515,7 +534,7 @@ export default function App() {
                 </h3>
               </SectionItem>
               <SectionItem delay="300">
-                <h2 className="text-4xl font-bold">Afvan Emirhan Çüçen Kimdir?</h2>
+                <h2 className="text-4xl font-bold">Affan Emirhan Çüçen Kimdir?</h2>
               </SectionItem>
               <SectionItem delay="400">
                 <p className="text-gray-400 leading-relaxed text-lg">
