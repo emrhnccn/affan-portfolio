@@ -23,8 +23,7 @@ const LinkedinIcon = ({ size = 24, className = "" }) => (
 // --- GEMINI API HELPER ---
 const apiKey = "AIzaSyBPp2c66qC8GLAs2KYEshRTz-P6KXAJbOM";
 const callGeminiAPI = async (prompt, systemInstruction) => {
-  // 404 gibi bulunamama durumlarına karşı Google'ın güncel modellerini sırayla dener.
-  const modelsToTry = ["gemini-1.5-flash-latest", "gemini-1.5-flash", "gemini-pro"];
+  const modelsToTry = ["gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-2.5-flash"];
   const delay = (ms) => new Promise(res => setTimeout(res, ms));
   const retries = [1000, 2000, 4000];
 
@@ -32,13 +31,9 @@ const callGeminiAPI = async (prompt, systemInstruction) => {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     
     const payload = {
+      systemInstruction: { parts: [{ text: systemInstruction }] },
       contents: [{ parts: [{ text: prompt }] }],
     };
-    
-    // Eski modeller systemInstruction desteklemediği için sadece 1.5 sürümünde bunu ekliyoruz.
-    if (model.includes("1.5")) {
-      payload.systemInstruction = { parts: [{ text: systemInstruction }] };
-    }
 
     for (let attempt = 0; attempt <= retries.length; attempt++) {
       try {
@@ -48,19 +43,13 @@ const callGeminiAPI = async (prompt, systemInstruction) => {
           body: JSON.stringify(payload)
         });
         
-        // Eğer model bulunamazsa (404), döngüyü kırıp hemen listedeki diğer modele geç.
-        if (response.status === 404) {
-          break; 
-        }
-        
+        if (response.status === 404) break;
         if (!response.ok) throw new Error(`API Hatası: ${response.status}`);
         
         const result = await response.json();
         return result.candidates?.[0]?.content?.parts?.[0]?.text || "Yanıt alınamadı.";
       } catch (error) {
-        if (attempt === retries.length) {
-           break;
-        }
+        if (attempt === retries.length) break;
         await delay(retries[attempt]);
       }
     }
@@ -539,7 +528,7 @@ export default function App() {
                 </h3>
               </SectionItem>
               <SectionItem delay="300">
-                <h2 className="text-4xl font-bold">Gerçek Zamanlı Sistemler & Oyun Mekanikleri.</h2>
+                <h2 className="text-4xl font-bold">Afvan Emirhan Çüçen Kimdir?</h2>
               </SectionItem>
               <SectionItem delay="400">
                 <p className="text-gray-400 leading-relaxed text-lg">
