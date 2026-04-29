@@ -20,41 +20,26 @@ const LinkedinIcon = ({ size = 24, className = "" }) => (
   </svg>
 );
 
-// --- GEMINI API HELPER ---
-const apiKey = "AIzaSyDCrYK9nZVGS9qWW2qHItlOKvYVFZsxPxE";
-const callGeminiAPI = async (prompt, systemInstruction) => {
-  const modelsToTry = ["gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-2.5-flash"];
-  const delay = (ms) => new Promise(res => setTimeout(res, ms));
-  const retries = [1000, 2000, 4000];
+// --- CLAUDE API HELPER ---
+const callClaudeAPI = async (prompt, systemInstruction) => {
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: systemInstruction,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
 
-  for (const model of modelsToTry) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    
-    const payload = {
-      systemInstruction: { parts: [{ text: systemInstruction }] },
-      contents: [{ parts: [{ text: prompt }] }],
-    };
-
-    for (let attempt = 0; attempt <= retries.length; attempt++) {
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        
-        if (response.status === 404) break;
-        if (!response.ok) throw new Error(`API Hatası: ${response.status}`);
-        
-        const result = await response.json();
-        return result.candidates?.[0]?.content?.parts?.[0]?.text || "Yanıt alınamadı.";
-      } catch (error) {
-        if (attempt === retries.length) break;
-        await delay(retries[attempt]);
-      }
-    }
+    if (!response.ok) throw new Error(`API Hatası: ${response.status}`);
+    const data = await response.json();
+    return data.content?.[0]?.text || "Yanıt alınamadı.";
+  } catch (error) {
+    return "AI modeline şu an ulaşılamıyor, lütfen daha sonra tekrar deneyin.";
   }
-  return "AI modeline şu an ulaşılamıyor, lütfen daha sonra tekrar deneyin.";
 };
 
 // --- CUSTOM HOOKS ---
@@ -150,7 +135,7 @@ const Terminal = () => {
         
         try {
           const sysPrompt = "Sen Affan Emirhan Çüçen'in kişisel yapay zeka asistanısın. Affan; Full-Stack web geliştirme, Unity oyun programlama ve teknik SEO alanlarında uzman bir yazılım geliştiricidir. Ziyaretçilere kısa, samimi ve teknik bir dille cevap ver.";
-          const response = await callGeminiAPI(query, sysPrompt);
+          const response = await callClaudeAPI(query, sysPrompt);
           setHistory(prev => {
             const filtered = prev.filter(h => h.text !== '✨ AI Asistan düşünüyor...');
             return [...filtered, { type: 'output', text: `✨ AI: ${response}` }];
@@ -298,7 +283,7 @@ export default function App() {
     try {
       const prompt = `Şu sektör veya problem için yenilikçi bir yazılım/oyun projesi fikri üret: "${ideaInput}". Fikir, Affan'ın yeteneklerine (React, Node.js, Unity, AI Entegrasyonları) çok uygun, modern ve fütüristik olmalı. Çözümü 3-4 cümleyle açıkla.`;
       const sysPrompt = "Sen yaratıcı bir yazılım mimarı ve proje danışmanısın. Ziyaretçilere çok fütüristik, havalı ve yenilikçi projeler sunarsın.";
-      const response = await callGeminiAPI(prompt, sysPrompt);
+      const response = await callClaudeAPI(prompt, sysPrompt);
       setAiIdea(response);
     } catch (error) {
       setAiIdea("Fikir üretilirken bir hata oluştu. Lütfen tekrar dene.");
