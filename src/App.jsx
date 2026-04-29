@@ -20,26 +20,28 @@ const LinkedinIcon = ({ size = 24, className = "" }) => (
   </svg>
 );
 
-// --- CLAUDE API HELPER ---
-const callClaudeAPI = async (prompt, systemInstruction) => {
-  try {
-    const response = await fetch("/api/claude", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: systemInstruction,
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
+// --- GEMINI API HELPER ---
+const callGeminiAPI = async (prompt, systemInstruction) => {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  
+  const payload = {
+    systemInstruction: { parts: [{ text: systemInstruction }] },
+    contents: [{ parts: [{ text: prompt }] }],
+  };
 
-    if (!response.ok) throw new Error(`Hata: ${response.status}`);
-    const data = await response.json();
-    return data.content?.[0]?.text || "Yanıt alınamadı.";
-  } catch (error) {
-    return "AI modeline şu an ulaşılamıyor, lütfen daha sonra tekrar deneyin.";
+  // Sadece 1 deneme, retry yok — rate limit'i tetikleme
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    throw new Error(`API Hatası: ${response.status}`);
   }
+
+  const result = await response.json();
+  return result.candidates?.[0]?.content?.parts?.[0]?.text || "Yanıt alınamadı.";
 };
 
 // --- CUSTOM HOOKS ---
@@ -135,7 +137,7 @@ const Terminal = () => {
         
         try {
           const sysPrompt = "Sen Affan Emirhan Çüçen'in kişisel yapay zeka asistanısın. Affan; Full-Stack web geliştirme, Unity oyun programlama ve teknik SEO alanlarında uzman bir yazılım geliştiricidir. Ziyaretçilere kısa, samimi ve teknik bir dille cevap ver.";
-          const response = await callClaudeAPI(query, sysPrompt);
+          const response = await callGeminiAPI(query, sysPrompt);
           setHistory(prev => {
             const filtered = prev.filter(h => h.text !== '✨ AI Asistan düşünüyor...');
             return [...filtered, { type: 'output', text: `✨ AI: ${response}` }];
@@ -283,7 +285,7 @@ export default function App() {
     try {
       const prompt = `Şu sektör veya problem için yenilikçi bir yazılım/oyun projesi fikri üret: "${ideaInput}". Fikir, Affan'ın yeteneklerine (React, Node.js, Unity, AI Entegrasyonları) çok uygun, modern ve fütüristik olmalı. Çözümü 3-4 cümleyle açıkla.`;
       const sysPrompt = "Sen yaratıcı bir yazılım mimarı ve proje danışmanısın. Ziyaretçilere çok fütüristik, havalı ve yenilikçi projeler sunarsın.";
-      const response = await callClaudeAPI(prompt, sysPrompt);
+      const response = await callGeminiAPI(prompt, sysPrompt);
       setAiIdea(response);
     } catch (error) {
       setAiIdea("Fikir üretilirken bir hata oluştu. Lütfen tekrar dene.");
