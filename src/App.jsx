@@ -21,7 +21,7 @@ const LinkedinIcon = ({ size = 24, className = "" }) => (
 );
 
 // --- GEMINI API HELPER ---
-const apiKey = "AIzaSyBPp2c66qC8GLAs2KYEshRTz-P6KXAJbOM";
+const apiKey = "AIzaSyDCrYK9nZVGS9qWW2qHItlOKvYVFZsxPxE";
 const callGeminiAPI = async (prompt, systemInstruction) => {
   const modelsToTry = ["gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-2.5-flash"];
   const delay = (ms) => new Promise(res => setTimeout(res, ms));
