@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import './App.css';
 import { 
   TerminalSquare, ChevronRight, 
   Code, ExternalLink, Mail, User, Monitor, Gamepad2, 
@@ -196,6 +197,11 @@ const Terminal = () => {
         default:
           newHistory.push({ type: 'error', text: `Komut bulunamadı: ${cmd}. Geçerli komutlar için "yardim" yazın.` });
       }
+      
+      if (newHistory.length > 50) {
+        newHistory.splice(0, newHistory.length - 50);
+      }
+      
       setHistory(newHistory);
       setInput('');
     }
@@ -313,7 +319,14 @@ export default function App() {
     }
   };
 
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [projectsData, setProjectsData] = useState([]);
+
   useEffect(() => {
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      setIsTouchDevice(true);
+    }
+    
     const updateCursor = (e) => {
       setCursorPos({ x: e.clientX, y: e.clientY });
     };
@@ -321,7 +334,7 @@ export default function App() {
     return () => window.removeEventListener('mousemove', updateCursor);
   }, []);
 
-  const projectsData = [
+  const fallbackProjects = [
     {
       title: "Gerçek Zamanlı Mesajlaşma",
       desc: "Socket.io kullanarak düşük gecikmeli (low-latency) anlık mesajlaşma altyapısı. MongoDB ile sohbet geçmişi modellemesi.",
@@ -378,40 +391,58 @@ export default function App() {
     }
   ];
 
+  useEffect(() => {
+    const fetchGithubProjects = async () => {
+      try {
+        const response = await fetch('https://api.github.com/users/emrhnccn/repos?sort=updated&per_page=6');
+        if (!response.ok) throw new Error('Ağ hatası');
+        const data = await response.json();
+        
+        const filtered = data.filter(repo => !repo.fork);
+        
+        const mappedProjects = filtered.map((repo, index) => ({
+          title: repo.name.replace(/-/g, ' ').replace(/_/g, ' '),
+          desc: repo.description || "GitHub projesi.",
+          longDesc: repo.description || "Bu proje GitHub üzerinden otomatik olarak çekilmiştir. İncelemek için GitHub butonuna tıklayabilirsiniz.",
+          tags: repo.topics && repo.topics.length > 0 ? repo.topics : (repo.language ? [repo.language] : ['GitHub']),
+          icon: <Code size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#00F5FF] transition-all duration-700 drop-shadow-[0_0_15px_rgba(0,245,255,0.5)]" />,
+          image: fallbackProjects[index % fallbackProjects.length]?.image || "https://opengraph.githubassets.com/1/" + repo.full_name,
+          github: repo.html_url
+        }));
+        
+        if (mappedProjects.length > 0) {
+          setProjectsData(mappedProjects);
+        } else {
+          setProjectsData(fallbackProjects);
+        }
+      } catch (error) {
+        console.error("Proje çekme hatası:", error);
+        setProjectsData(fallbackProjects);
+      }
+    };
+    
+    fetchGithubProjects();
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-[#EAEAEA] font-sans overflow-x-hidden selection:bg-[#00F5FF] selection:text-[#0D0D0D]">
       
-      {/* Global Styles for Scrollbar & Background Grid */}
-      <style dangerouslySetInnerHTML={{__html: `
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0D0D0D; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #00F5FF; }
-        
-        .bg-grid {
-          background-size: 40px 40px;
-          background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                            linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-          mask-image: radial-gradient(circle at center, black, transparent 80%);
-          -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
-        }
-        
-        body { cursor: none; }
-        a, button, input { cursor: none; }
-      `}} />
-
-      {/* Custom Cursor */}
-      <div 
-        className="fixed top-0 left-0 w-8 h-8 rounded-full border-2 border-[#00F5FF] pointer-events-none z-[100] transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-100 ease-out mix-blend-screen"
-        style={{ 
-          transform: `translate(${cursorPos.x}px, ${cursorPos.y}px) scale(${isHovering ? 1.5 : 1})`,
-          boxShadow: isHovering ? '0 0 20px #00F5FF' : '0 0 10px rgba(0,245,255,0.5)'
-        }}
-      />
-      <div 
-        className="fixed top-0 left-0 w-1 h-1 bg-[#FF00C8] rounded-full pointer-events-none z-[100] transform -translate-x-1/2 -translate-y-1/2"
-        style={{ transform: `translate(${cursorPos.x}px, ${cursorPos.y}px)` }}
-      />
+      {/* Custom Cursor - Sadece touch olmayan cihazlarda göster */}
+      {!isTouchDevice && (
+        <>
+          <div 
+            className="fixed top-0 left-0 w-8 h-8 rounded-full border-2 border-[#00F5FF] pointer-events-none z-[100] transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-100 ease-out mix-blend-screen"
+            style={{ 
+              transform: `translate(${cursorPos.x}px, ${cursorPos.y}px) scale(${isHovering ? 1.5 : 1})`,
+              boxShadow: isHovering ? '0 0 20px #00F5FF' : '0 0 10px rgba(0,245,255,0.5)'
+            }}
+          />
+          <div 
+            className="fixed top-0 left-0 w-1 h-1 bg-[#FF00C8] rounded-full pointer-events-none z-[100] transform -translate-x-1/2 -translate-y-1/2"
+            style={{ transform: `translate(${cursorPos.x}px, ${cursorPos.y}px)` }}
+          />
+        </>
+      )}
 
       {/* Fixed Grid Background */}
       <div className="fixed inset-0 pointer-events-none z-0 bg-grid opacity-50" />
