@@ -21,47 +21,35 @@ const LinkedinIcon = ({ size = 24, className = "" }) => (
   </svg>
 );
 
-// --- GEMINI API HELPER ---
-const getApiKey = () => {
-  try {
-    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_GEMINI_API_KEY) {
-      return import.meta.env.VITE_GEMINI_API_KEY;
-    }
-  } catch(e) {}
-  return "";
-};
-const apiKey = getApiKey();
-
-const callGeminiAPI = async (prompt, systemInstruction) => {
-  if (!apiKey) return "API Anahtarı bulunamadı. Lütfen Vercel ortam değişkenlerini kontrol edin.";
-
-  // Kullanıcının listesindeki güncel gemini-2.5-flash modeline geçirildi
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+// --- YEREL AI SİMÜLASYONU (API GEREKTİRMEZ) ---
+const simulateAIResponse = async (query, context) => {
+  // Gerçekçilik için kısa bir bekleme süresi
+  await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 1000));
   
-  const payload = {
-    contents: [{ parts: [{ text: prompt }] }],
-    systemInstruction: { parts: [{ text: systemInstruction }] }
-  };
+  const q = query.toLowerCase();
+  
+  if (q.includes("merhaba") || q.includes("selam")) return "Merhaba! Ben Affan'ın asistanıyım. Portföyü gezmene yardımcı olabilirim.";
+  if (q.includes("nasılsın") || q.includes("naber")) return "Harikayım! Senin için burada bekliyor ve Affan'ın projelerini tanıtıyorum. Sen nasılsın?";
+  if (q.includes("kimsin") || q.includes("adın ne")) return "Ben kural tabanlı, API gerektirmeyen (bedava çalışan 😁) bir yapay zeka asistanıyım.";
+  if (q.includes("iletişim") || q.includes("mail") || q.includes("ulaşabilirim")) return "Affan ile 'emrhn.ccn@gmail.com' üzerinden veya LinkedIn'den (/in/affanccn) iletişime geçebilirsin.";
+  if (q.includes("proje") || q.includes("oyun") || q.includes("yaptın")) return "Gerçek zamanlı mesajlaşma, KYK yurt otomasyonu ve 3D Unity oyunları gibi birçok projesi var. 'projeler' yazarak listeyi görebilirsin!";
+  if (q.includes("yetenek") || q.includes("dil") || q.includes("biliyorsun")) return "React, Node.js, Unity(C#), MySQL ve MongoDB gibi teknolojilere hakim.";
+  if (q.includes("aşk") || q.includes("sevgili")) return "Ben sadece bir kod parçasıyım, duygularım yok... ama Affan kod yazmaya aşık! 💻❤️";
+  if (q.includes("maaş") || q.includes("ücret") || q.includes("para")) return "Bunu doğrudan kendisiyle konuşmalısın! İletişim: emrhn.ccn@gmail.com";
+  if (q.includes("teşekkür")) return "Rica ederim, her zaman buradayım!";
+  
+  return "Bunu anladığımdan emin değilim. Ama Affan'ın projeleri, yetenekleri veya iletişim bilgileri hakkında bir şeyler sorabilirsin. (Örn: 'hangi dilleri biliyor?')";
+};
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("API Hatası Detayı:", errorText);
-      throw new Error(`API Hatası: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    return result.candidates?.[0]?.content?.parts?.[0]?.text || "Yanıt alınamadı.";
-  } catch (error) {
-    console.error("Bağlantı Hatası:", error);
-    return "Yapay zeka sistemine şu an bağlanılamıyor. Lütfen daha sonra tekrar deneyin.";
-  }
+const getRandomIdea = () => {
+  const ideas = [
+    "🚀 Kuantum şifrelemeli, blockchain tabanlı merkeziyetsiz bir dosya paylaşım ağı oluştur.",
+    "🎮 Unity ile nöral ağlar (neural networks) kullanarak kendi kendine öğrenen düşmanların olduğu bir co-op hayatta kalma oyunu geliştir.",
+    "🧠 Kullanıcının yazdığı metinlerin duygu analizini yaparak, ona uygun arka plan müziği ve arayüz rengi üreten bir web uygulaması tasarla.",
+    "🛒 E-ticaret siteleri için, müşterinin sepette bıraktığı ürünleri AR (Artırılmış Gerçeklik) ile odasında gösterebilen bir eklenti kodla.",
+    "🤖 Sadece sesli komutlarla ve doğal dil işleme ile (NLP) tüm CRUD işlemlerini yapabilen bir veritabanı yönetim paneli tasarla."
+  ];
+  return ideas[Math.floor(Math.random() * ideas.length)];
 };
 
 // --- CUSTOM HOOKS ---
@@ -156,8 +144,7 @@ const Terminal = () => {
         setInput('');
         
         try {
-          const sysPrompt = "Sen Affan Emirhan Çüçen'in kişisel yapay zeka asistanısın. Affan; Full-Stack web geliştirme, Unity oyun programlama ve teknik SEO alanlarında uzman bir yazılım geliştiricidir. Ziyaretçilere kısa, samimi ve teknik bir dille cevap ver.";
-          const response = await callGeminiAPI(query, sysPrompt);
+          const response = await simulateAIResponse(query, "terminal");
           setHistory(prev => {
             const filtered = prev.filter(h => h.text !== '✨ AI Asistan düşünüyor...');
             return [...filtered, { type: 'output', text: `✨ AI: ${response}` }];
@@ -208,36 +195,46 @@ const Terminal = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-12 bg-[#050505] border border-white/10 rounded-xl overflow-hidden shadow-[0_0_30px_rgba(0,245,255,0.1)]">
-      <div className="flex items-center px-4 py-2 bg-white/5 border-b border-white/10">
+    <div className="w-full max-w-4xl mx-auto mt-12 bg-[#050505] border border-white/20 rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,245,255,0.15)] relative">
+      
+      {/* CRT Scanline Effect (CSS) */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-10" style={{ backgroundImage: "linear-gradient(transparent 50%, rgba(0, 0, 0, 0.25) 50%)", backgroundSize: "100% 4px" }}></div>
+      <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_100px_rgba(0,0,0,0.9)] z-10"></div>
+      
+      {/* Terminal Header */}
+      <div className="flex items-center px-4 py-3 bg-gradient-to-r from-black via-gray-900 to-black border-b border-white/10 relative z-20">
         <div className="flex space-x-2">
-          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+          <div className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_5px_red]"></div>
+          <div className="w-3 h-3 rounded-full bg-yellow-500 shadow-[0_0_5px_yellow]"></div>
+          <div className="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_5px_green]"></div>
         </div>
-        <div className="mx-auto text-xs text-gray-400 font-mono flex items-center">
-          <TerminalSquare size={14} className="mr-2" /> terminal@affanccn
+        <div className="mx-auto text-xs text-gray-400 font-mono flex items-center bg-black/50 px-3 py-1 rounded-md border border-white/5">
+          <TerminalSquare size={14} className="mr-2 text-[#00F5FF]" /> root@affanccn:~
         </div>
       </div>
-      <div ref={scrollContainerRef} className="p-6 h-80 overflow-y-auto font-mono text-sm scroll-smooth">
+      
+      {/* Terminal Body */}
+      <div ref={scrollContainerRef} className="p-6 h-96 overflow-y-auto font-mono text-sm scroll-smooth relative z-20" style={{ textShadow: "0 0 5px rgba(255,255,255,0.3)" }}>
         {history.map((line, i) => (
-          <div key={i} className="mb-2">
-            {line.type === 'user' && <span className="text-[#00F5FF]">{line.text}</span>}
-            {line.type === 'system' && <span className="text-[#FF00C8]">{line.text}</span>}
-            {line.type === 'output' && <span className="text-gray-300 whitespace-pre-line leading-relaxed">{line.text}</span>}
-            {line.type === 'error' && <span className="text-red-400">{line.text}</span>}
+          <div key={i} className="mb-3 tracking-wide">
+            {line.type === 'user' && <span className="text-[#00F5FF] font-bold drop-shadow-[0_0_8px_rgba(0,245,255,0.8)]">{line.text}</span>}
+            {line.type === 'system' && <span className="text-[#FF00C8] drop-shadow-[0_0_8px_rgba(255,0,200,0.8)]">{line.text}</span>}
+            {line.type === 'output' && <span className="text-green-400 whitespace-pre-line leading-relaxed drop-shadow-[0_0_5px_rgba(74,222,128,0.5)]">{line.text}</span>}
+            {line.type === 'error' && <span className="text-red-400 drop-shadow-[0_0_5px_red]">{line.text}</span>}
           </div>
         ))}
-        <div className="flex items-center text-[#00F5FF] mt-2">
+        <div className="flex items-center text-[#00F5FF] mt-4 font-bold drop-shadow-[0_0_8px_rgba(0,245,255,0.8)]">
+          <span className="animate-pulse mr-2">➜</span>
           <span>ziyaretci@affan:~$</span>
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleCommand}
-            className="flex-1 bg-transparent border-none outline-none text-gray-100 ml-2 font-mono focus:ring-0"
+            className="flex-1 bg-transparent border-none outline-none text-green-300 ml-2 font-mono focus:ring-0 placeholder-gray-600 drop-shadow-[0_0_5px_rgba(74,222,128,0.5)]"
             autoComplete="off"
             spellCheck="false"
+            autoFocus
           />
         </div>
       </div>
@@ -308,10 +305,10 @@ export default function App() {
     setIsGeneratingIdea(true);
     setAiIdea(null);
     try {
-      const prompt = `Şu sektör veya problem için yenilikçi bir yazılım/oyun projesi fikri üret: "${ideaInput}". Fikir, Affan'ın yeteneklerine (React, Node.js, Unity, AI Entegrasyonları) çok uygun, modern ve fütüristik olmalı. Çözümü 3-4 cümleyle açıkla.`;
-      const sysPrompt = "Sen yaratıcı bir yazılım mimarı ve proje danışmanısın. Ziyaretçilere çok fütüristik, havalı ve yenilikçi projeler sunarsın.";
-      const response = await callGeminiAPI(prompt, sysPrompt);
-      setAiIdea(response);
+      // API kullanmadan rastgele fikir üret
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Animasyon efekti için bekle
+      const response = getRandomIdea();
+      setAiIdea(`Seçilen Sektör/Problem: "${ideaInput}"\n\n🎯 Öneri: ${response}`);
     } catch (error) {
       setAiIdea("Fikir üretilirken bir hata oluştu. Lütfen tekrar dene.");
     } finally {
