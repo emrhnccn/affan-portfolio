@@ -404,7 +404,64 @@ export default function App() {
           return;
         }
 
-        // İlk 6 için fallback görsel ve açıklamayı kullan, geri kalanlar için GitHub verisi
+        // Extra projeler için sabit açıklamalar (görsel yok)
+        const extraProjectsMap = {
+          'pendikcekici': {
+            title: 'Pendik Çekici Hizmetleri',
+            desc: 'İstanbul Pendik bölgesine özel çekici ve yol yardım hizmeti sunan statik kurumsal web sitesi. SEO odaklı, hızlı yüklenen ve mobil uyumlu tasarımıyla müşteri kazanımını hedefler.',
+            longDesc: 'Pendik bölgesinde faaliyet gösteren bir çekici firması için geliştirdiğim kurumsal web sitesidir. Hızlı yükleme süresi ve teknik SEO optimizasyonlarıyla arama motorlarında üst sıralarda yer almayı hedefler. HTML/CSS ile sade ve etkin bir kullanıcı deneyimi sunulmuştur.',
+            tags: ['HTML', 'CSS', 'SEO', 'Kurumsal Site'],
+          },
+          'BereketSisesiGit': {
+            title: 'Bereket Sesi (v1)',
+            desc: 'Bereket Sesi markasının ilk versiyon web sitesi. Marka kimliğini yansıtan sade arayüzü ve içerik yönetim altyapısıyla kurumsal dijital varlık oluşturur.',
+            longDesc: 'Bereket Sesi markası için hazırladığım ilk versiyon kurumsal web sitesidir. Marka kimliğine uygun renk paleti ve tipografi seçimleriyle profesyonel bir görünüm sağlanmıştır. Bu versiyon üzerine iterasyonlar yapılarak daha gelişmiş sürümlere geçilmiştir.',
+            tags: ['Web Sitesi', 'Kurumsal', 'Marka', 'UI/UX'],
+          },
+          'aiflix': {
+            title: 'AIFlix',
+            desc: 'Netflix benzeri arayüze sahip, yapay zeka destekli içerik öneri platformu prototipi. Kullanıcı geçmişine göre kişiselleştirilmiş film ve dizi önerileri üretir.',
+            longDesc: 'Netflix arayüzünden ilham alarak tasarladığım yapay zeka destekli içerik öneri platformudur. Kullanıcının izleme geçmişini analiz ederek kişiselleştirilmiş öneriler sunar. Modern React mimarisi ve API entegrasyonuyla zengin bir kullanıcı deneyimi hedeflenmiştir.',
+            tags: ['React', 'AI', 'TypeScript', 'API'],
+          },
+          'affan-portfolio': {
+            title: 'Affan Portfolio',
+            desc: 'Bu portfolyo sitesinin kaynak kodu. React, Vite ve Tailwind CSS ile inşa edilmiş; terminal, AI asistan ve gerçek zamanlı GitHub entegrasyonu içeren kişisel portfolyo uygulaması.',
+            longDesc: 'Şu an gezdiğiniz bu portfolyo sitesinin kaynak kodudur. React + Vite altyapısı, özel terminal simülatörü, fare takipli memoji, scroll animasyonları ve GitHub API entegrasyonu ile modern bir geliştirici portfolyosu tasarlandı.',
+            tags: ['React', 'Vite', 'Tailwind CSS', 'GitHub API'],
+          },
+          'ersa-ticaret': {
+            title: 'Ersa Ticaret',
+            desc: 'Ticaret şirketi için geliştirilen TypeScript tabanlı e-ticaret web uygulaması. Ürün listeleme, kategori filtreleme ve iletişim formu modülleri içerir.',
+            longDesc: 'Ersa Ticaret şirketi için geliştirdiğim kurumsal e-ticaret web uygulamasıdır. TypeScript ile tip güvenli bir yapı oluşturulmuş, ürün kataloğu, kategori yönetimi ve müşteri iletişim formu entegre edilmiştir.',
+            tags: ['TypeScript', 'React', 'E-Ticaret', 'Kurumsal'],
+          },
+          'salas-rezervasyon': {
+            title: 'Salaas Cafe Restaurant',
+            desc: 'Salaas Cafe & Restaurant için geliştirilen online rezervasyon ve menü tanıtım sistemi. Masa rezervasyonu, menü listeleme ve canlı yayında aktif web uygulaması.',
+            longDesc: 'Salaas Cafe Restaurant için özel olarak geliştirdiğim web uygulamasıdır. Müşteriler online masa rezervasyonu yapabilir, menüyü inceleyebilir. Yönetici panelinden rezervasyon takibi ve içerik güncelleme yapılabilir.',
+            tags: ['JavaScript', 'Node.js', 'Rezervasyon', 'Restoran'],
+          },
+          'GustoPos': {
+            title: 'GustoPos',
+            desc: 'Restoran ve kafe işletmeleri için TypeScript tabanlı POS (Satış Noktası) yönetim sistemi. Sipariş takibi, masa yönetimi ve gelir raporlama modülleri içerir.',
+            longDesc: 'Restoran ve kafe işletmelerine yönelik geliştirdiğim modern POS sistemidir. TypeScript ile güvenli ve ölçeklenebilir bir backend oluşturulmuş; masa bazlı sipariş takibi, mutfak ekranı entegrasyonu ve günlük/haftalık gelir raporları sunulmaktadır.',
+            tags: ['TypeScript', 'POS', 'Restoran Yönetimi', 'Dashboard'],
+          },
+          'Bereketsisesi': {
+            title: 'Bereket Sesi (v2)',
+            desc: 'Bereket Sesi markasının yeniden tasarlanmış TypeScript tabanlı web sitesi. Geliştirilmiş UI/UX, içerik yönetimi ve performans optimizasyonları ile v1'in üzerine inşa edilmiştir.',
+            longDesc: 'Bereket Sesi markası için v1 üzerine iterasyon yaparak geliştirdiğim yenilenmiş web uygulamasıdır. TypeScript geçişiyle tip güvenliği sağlanmış, yeni bileşen yapısı ve gelişmiş animasyonlarla kullanıcı deneyimi önemli ölçüde iyileştirilmiştir.',
+            tags: ['TypeScript', 'React', 'UI/UX', 'Performans'],
+          },
+          'nakliyat': {
+            title: 'Nakliyat Firması Sitesi',
+            desc: 'Nakliyat firması için CSS ağırlıklı geliştirilen kurumsal web sitesi. Hizmet tanıtımı, fiyat teklifi formu ve responsive tasarımıyla potansiyel müşterilere ulaşmayı hedefler.',
+            longDesc: 'Bir nakliyat firması için geliştirdiğim kurumsal web sitesidir. CSS animasyonları ve responsive tasarım ile tüm cihazlarda mükemmel görünüm sağlanmıştır. Hizmet sayfaları, fiyat teklifi formu ve iletişim modülü içermektedir.',
+            tags: ['CSS', 'HTML', 'Kurumsal', 'SEO'],
+          },
+        };
+
         const iconColors = [
           <MessageSquare size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#00F5FF] transition-all duration-700 drop-shadow-[0_0_15px_rgba(0,245,255,0.5)]" />,
           <LayoutDashboard size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#FF00C8] transition-all duration-700 drop-shadow-[0_0_15px_rgba(255,0,200,0.5)]" />,
@@ -416,13 +473,15 @@ export default function App() {
         
         const mappedProjects = filtered.map((repo, index) => {
           const fallback = fallbackProjects[index];
+          const extra = extraProjectsMap[repo.name];
+          const isExtra = !fallback; // index >= 6 ya da fallback olmayan
           return {
-            title: fallback ? fallback.title : repo.name.replace(/-/g, ' ').replace(/_/g, ' '),
-            desc: fallback ? fallback.desc : (repo.description || 'GitHub projesi.'),
-            longDesc: fallback ? fallback.longDesc : (repo.description || 'Bu proje GitHub üzerinden otomatik olarak çekilmiştir.'),
-            tags: fallback ? fallback.tags : (repo.topics && repo.topics.length > 0 ? repo.topics : (repo.language ? [repo.language] : ['GitHub'])),
+            title: fallback ? fallback.title : (extra ? extra.title : repo.name.replace(/-/g, ' ').replace(/_/g, ' ')),
+            desc: fallback ? fallback.desc : (extra ? extra.desc : (repo.description || 'GitHub projesi.')),
+            longDesc: fallback ? fallback.longDesc : (extra ? extra.longDesc : (repo.description || 'Bu proje GitHub üzerinden otomatik olarak çekilmiştir.')),
+            tags: fallback ? fallback.tags : (extra ? extra.tags : (repo.topics && repo.topics.length > 0 ? repo.topics : (repo.language ? [repo.language] : ['GitHub']))),
             icon: fallback ? fallback.icon : (iconColors[index % iconColors.length]),
-            image: fallback ? fallback.image : `/images/proje${(index % 6) + 1}.png`,
+            image: fallback ? fallback.image : null, // Extra projeler görselsiz
             github: repo.html_url
           };
         });
@@ -650,18 +709,28 @@ export default function App() {
                   className="group relative h-full flex flex-col bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-[#00F5FF]/50 hover:shadow-[0_0_25px_rgba(0,245,255,0.15)] transition-all duration-500 cursor-none"
                   onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}
                 >
-                  <div className="h-48 bg-[#111] relative overflow-hidden flex items-center justify-center">
-                    <img 
-                      src={project.image} 
-                      alt={project.title} 
-                      className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-70 group-hover:scale-110 transition-all duration-700"
-                      onError={(e) => { e.target.style.display = 'none'; }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-90 group-hover:opacity-40 transition-opacity duration-500" />
-                    <div className="relative z-10 bg-black/40 p-4 rounded-full backdrop-blur-sm border border-white/5 group-hover:border-white/20 transition-all duration-500">
-                      {project.icon}
+                  {/* Üst görsel alan: resim varsa göster, yoksa gradient+icon */}
+                  {project.image ? (
+                    <div className="h-48 bg-[#111] relative overflow-hidden flex items-center justify-center">
+                      <img 
+                        src={project.image} 
+                        alt={project.title} 
+                        className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-70 group-hover:scale-110 transition-all duration-700"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-90 group-hover:opacity-40 transition-opacity duration-500" />
+                      <div className="relative z-10 bg-black/40 p-4 rounded-full backdrop-blur-sm border border-white/5 group-hover:border-white/20 transition-all duration-500">
+                        {project.icon}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="h-48 relative overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0D0D0D 0%, #111827 50%, #0D0D0D 100%)' }}>
+                      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 30% 40%, rgba(0,245,255,0.3) 0%, transparent 60%), radial-gradient(circle at 70% 60%, rgba(255,0,200,0.2) 0%, transparent 60%)' }} />
+                      <div className="relative z-10 bg-black/40 p-5 rounded-full backdrop-blur-sm border border-white/10 group-hover:border-[#00F5FF]/30 group-hover:shadow-[0_0_20px_rgba(0,245,255,0.2)] transition-all duration-500">
+                        {project.icon}
+                      </div>
+                    </div>
+                  )}
                   <div className="p-6 flex-1 flex flex-col relative z-10 bg-[#050505]">
                     <div className="flex justify-between items-start mb-3">
                       <h3 className="text-xl font-bold group-hover:text-[#00F5FF] transition-colors pr-4">{project.title}</h3>
