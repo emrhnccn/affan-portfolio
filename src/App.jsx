@@ -318,6 +318,7 @@ export default function App() {
 
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [projectsData, setProjectsData] = useState([]);
+  const [showAllProjects, setShowAllProjects] = useState(false);
 
   useEffect(() => {
     if (window.matchMedia("(pointer: coarse)").matches) {
@@ -334,7 +335,7 @@ export default function App() {
   const fallbackProjects = [
     {
       title: "Gerçek Zamanlı Mesajlaşma",
-      desc: "Socket.io kullanarak düşük gecikmeli (low-latency) anlık mesajlaşma altyapısı. MongoDB ile sohbet geçmişi modellemesi.",
+      desc: "Node.js ve Socket.io ile inşa edilmiş anlık mesajlaşma uygulaması. Kullanıcılar oda bazlı sohbet edebilir, mesaj geçmişi MongoDB'de saklanır ve Vercel üzerinde canlıya alınmıştır.",
       longDesc: "Kullanıcılar arası iletişim için Node.js ve Socket.io kullanarak geliştirdiğim düşük gecikmeli mesajlaşma altyapısıdır. MongoDB ile sohbet geçmişini modelledim. Projeyi Ngrok ve Vercel ile canlı ortama taşıyıp responsive (mobil uyumlu) bir arayüz entegre ettim.",
       tags: ["Node.js", "Socket.io", "MongoDB", "Tailwind CSS"],
       icon: <MessageSquare size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#00F5FF] transition-all duration-700 drop-shadow-[0_0_15px_rgba(0,245,255,0.5)]" />,
@@ -343,7 +344,7 @@ export default function App() {
     },
     {
       title: "Restoran Rezervasyon Sistemi",
-      desc: "Kapasite yönetimi sağlayan dinamik masa ve rezervasyon sistemi. İstemci tarafında anlık boş masa takibi.",
+      desc: "Restoranlar için geliştirilmiş React + Node.js tabanlı kapasite ve masa yönetim sistemi. Müşteriler anlık boş masaları görebilir, yönetici paneli doluluk analizleri sunar.",
       longDesc: "Restoranlar için özel olarak geliştirilmiş kapasite yönetim sistemidir. Dinamik masa durumu ve rezervasyon takibini içerir. İstemci (müşteri) tarafında anlık boş masa takibi sağlarken, yönetici panelinde rezervasyon ve doluluk analizleri sunan güvenli bir yapı tasarladım.",
       tags: ["React", "Node.js", "Express", "Algoritmik Planlama"],
       icon: <LayoutDashboard size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#FF00C8] transition-all duration-700 drop-shadow-[0_0_15px_rgba(255,0,200,0.5)]" />,
@@ -352,7 +353,7 @@ export default function App() {
     },
     {
       title: "KYK Yurt Otomasyonu",
-      desc: "MySQL ile öğrenci, oda, kapasite ve yemekhane haklarını algoritmik olarak takip eden backend servisleri.",
+      desc: "MySQL üzerine kurulu yurt yönetim sistemi; öğrenci kayıt, oda atama, yemekhane hakkı ve kapasite takibini algoritmik olarak yönetir. Tüm mimari baştan tasarlanmıştır.",
       longDesc: "Sistem mimarisini tamamen kendim tasarladığım bir otomasyon sistemidir. MySQL kullanarak öğrenci, oda ve kapasite bilgilerini yöneten kompleks bir ilişkisel veritabanı oluşturdum. Yemekhane hakları, giriş-çıkış saatleri ve oda doluluk oranlarını algoritmik olarak takip eder.",
       tags: ["Node.js", "MySQL", "RDBMS", "API Geliştirme"],
       icon: <Database size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#00F5FF] transition-all duration-700 drop-shadow-[0_0_15px_rgba(0,245,255,0.5)]" />,
@@ -361,7 +362,7 @@ export default function App() {
     },
     {
       title: "3D Co-op Bulmaca Oyunu",
-      desc: "İki oyuncunun eşzamanlı etkileşimine dayalı 3D bulmaca mekanikleri. Rigidbody fiziği ile bellek optimizasyonu.",
+      desc: "Unity 3D ile geliştirilmiş iki oyunculu co-op bulmaca oyunu. Rigidbody fiziği, Raycast etkileşimleri ve karakter senkronizasyonu içerir; Clean Code prensiplerine göre optimize edilmiştir.",
       longDesc: "İki oyuncunun (Co-op) eşzamanlı etkileşimine dayalı 3D bulmaca mekanikleri içeren Unity oyunumdur. Karakterler arası veri senkronizasyonu sağlandı. Rigidbody fiziği ve Raycast etkileşimleri kullanılarak Clean Code (temiz kod) prensipleriyle bellek optimizasyonu yapıldı.",
       tags: ["Unity 3D", "C#", "Level Design", "Fizik Motoru"],
       icon: <Gamepad2 size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#FF00C8] transition-all duration-700 drop-shadow-[0_0_15px_rgba(255,0,200,0.5)]" />,
@@ -370,7 +371,7 @@ export default function App() {
     },
     {
       title: "Kampüs Temalı Match-3",
-      desc: "Blender ile 3D/2D modellenmiş binalar, grid tabanlı Match-3 algoritmaları ve API senkronizasyonlu Leaderboard.",
+      desc: "Üniversite bitirme projesi; Blender ile modellenen kampüs binaları Unity'ye entegre edilmiş, C# ile Match-3 algoritmaları yazılmış ve API destekli Leaderboard sistemi kurulmuştur.",
       longDesc: "Üniversite bitirme projem olarak hazırladığım Kampüs temalı Match-3 oyunu. Blender ile kampüs binalarını modelleyip Unity'ye dinamik level haritası olarak entegre ettim. C# ile grid tabanlı Match-3 algoritmaları yazdım ve API üzerinden veri senkronizasyonu sağlayan Leaderboard (Liderlik Tablosu) kurdum.",
       tags: ["Unity", "C#", "Blender", "Backend API"],
       icon: <Monitor size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#00F5FF] transition-all duration-700 drop-shadow-[0_0_15px_rgba(0,245,255,0.5)]" />,
@@ -379,7 +380,7 @@ export default function App() {
     },
     {
       title: "AI & Veri Otomasyonları",
-      desc: "LLM API entegrasyonuyla dinamik içerik üretimi ve Web Scraping ile operasyonel verimliliği artıran scriptler.",
+      desc: "LLM API entegrasyonu ile dinamik içerik üreten ve Web Scraping botlarıyla internetten veri toplayan Ar-Ge projeleri. Tekrarlayan iş akışlarını otomatize ederek süreçleri hızlandırır.",
       longDesc: "Ar-Ge projelerim kapsamında geliştirdiğim otomasyon sistemleri. LLM (Yapay Zeka API'leri) entegrasyonuyla dinamik içerik üreten sistemler ve Web Scraping (Veri Kazıma) ile internetten veri toplayan botlar tasarladım. Tekrarlayan görevleri otomatize ederek süreçleri hızlandırır.",
       tags: ["LLM API", "Node.js", "Web Scraping", "Otomasyon"],
       icon: <Cpu size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#FF00C8] transition-all duration-700 drop-shadow-[0_0_15px_rgba(255,0,200,0.5)]" />,
@@ -391,27 +392,42 @@ export default function App() {
   useEffect(() => {
     const fetchGithubProjects = async () => {
       try {
-        const response = await fetch('https://api.github.com/users/emrhnccn/repos?sort=updated&per_page=6');
+        // Tüm repoları çek (pinli değil, tümü)
+        const response = await fetch('https://api.github.com/users/emrhnccn/repos?sort=updated&per_page=100');
         if (!response.ok) throw new Error('Ağ hatası');
         const data = await response.json();
         
         const filtered = data.filter(repo => !repo.fork);
-        
-        const mappedProjects = filtered.map((repo, index) => ({
-          title: repo.name.replace(/-/g, ' ').replace(/_/g, ' '),
-          desc: repo.description || "GitHub projesi.",
-          longDesc: repo.description || "Bu proje GitHub üzerinden otomatik olarak çekilmiştir. İncelemek için GitHub butonuna tıklayabilirsiniz.",
-          tags: repo.topics && repo.topics.length > 0 ? repo.topics : (repo.language ? [repo.language] : ['GitHub']),
-          icon: <Code size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#00F5FF] transition-all duration-700 drop-shadow-[0_0_15px_rgba(0,245,255,0.5)]" />,
-          image: fallbackProjects[index % fallbackProjects.length]?.image || "https://opengraph.githubassets.com/1/" + repo.full_name,
-          github: repo.html_url
-        }));
-        
-        if (mappedProjects.length > 0) {
-          setProjectsData(mappedProjects);
-        } else {
+
+        if (filtered.length === 0) {
           setProjectsData(fallbackProjects);
+          return;
         }
+
+        // İlk 6 için fallback görsel ve açıklamayı kullan, geri kalanlar için GitHub verisi
+        const iconColors = [
+          <MessageSquare size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#00F5FF] transition-all duration-700 drop-shadow-[0_0_15px_rgba(0,245,255,0.5)]" />,
+          <LayoutDashboard size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#FF00C8] transition-all duration-700 drop-shadow-[0_0_15px_rgba(255,0,200,0.5)]" />,
+          <Database size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#00F5FF] transition-all duration-700 drop-shadow-[0_0_15px_rgba(0,245,255,0.5)]" />,
+          <Gamepad2 size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#FF00C8] transition-all duration-700 drop-shadow-[0_0_15px_rgba(255,0,200,0.5)]" />,
+          <Monitor size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#00F5FF] transition-all duration-700 drop-shadow-[0_0_15px_rgba(0,245,255,0.5)]" />,
+          <Cpu size={40} className="text-gray-300 group-hover:scale-125 group-hover:text-[#FF00C8] transition-all duration-700 drop-shadow-[0_0_15px_rgba(255,0,200,0.5)]" />,
+        ];
+        
+        const mappedProjects = filtered.map((repo, index) => {
+          const fallback = fallbackProjects[index];
+          return {
+            title: fallback ? fallback.title : repo.name.replace(/-/g, ' ').replace(/_/g, ' '),
+            desc: fallback ? fallback.desc : (repo.description || 'GitHub projesi.'),
+            longDesc: fallback ? fallback.longDesc : (repo.description || 'Bu proje GitHub üzerinden otomatik olarak çekilmiştir.'),
+            tags: fallback ? fallback.tags : (repo.topics && repo.topics.length > 0 ? repo.topics : (repo.language ? [repo.language] : ['GitHub'])),
+            icon: fallback ? fallback.icon : (iconColors[index % iconColors.length]),
+            image: fallback ? fallback.image : `/images/proje${(index % 6) + 1}.png`,
+            github: repo.html_url
+          };
+        });
+        
+        setProjectsData(mappedProjects);
       } catch (error) {
         console.error("Proje çekme hatası:", error);
         setProjectsData(fallbackProjects);
@@ -597,15 +613,36 @@ export default function App() {
         {/* PROJECTS SECTION */}
         <section id="projeler" className="py-32 max-w-6xl mx-auto">
           <SectionItem>
-            <div className="mb-16">
-              <h3 className="text-[#00F5FF] font-mono text-sm mb-2">02. Seçilmiş Çalışmalar</h3>
-              <h2 className="text-4xl font-bold">Öne Çıkan Projeler</h2>
+            <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div>
+                <h3 className="text-[#00F5FF] font-mono text-sm mb-2">02. Seçilmiş Çalışmalar</h3>
+                <h2 className="text-4xl font-bold">Öne Çıkan Projeler</h2>
+                <p className="text-gray-400 mt-3 text-sm">
+                  {showAllProjects
+                    ? `${projectsData.length} projenin tamamı gösteriliyor`
+                    : `${Math.min(6, projectsData.length)} öncelikli proje gösteriliyor · Toplam ${projectsData.length} proje`
+                  }
+                </p>
+              </div>
+              {projectsData.length > 6 && (
+                <button
+                  onClick={() => setShowAllProjects(prev => !prev)}
+                  onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}
+                  className="flex-shrink-0 px-6 py-3 rounded-lg border border-[#00F5FF]/50 text-[#00F5FF] bg-[#00F5FF]/5 hover:bg-[#00F5FF] hover:text-[#0D0D0D] transition-all duration-300 font-semibold text-sm tracking-wide shadow-[0_0_15px_rgba(0,245,255,0.1)] hover:shadow-[0_0_25px_rgba(0,245,255,0.4)] flex items-center gap-2 cursor-none"
+                >
+                  {showAllProjects ? (
+                    <><span>↑</span> Küçült</>
+                  ) : (
+                    <><Search size={16} /> Tüm Projeleri Gör ({projectsData.length})</>
+                  )}
+                </button>
+              )}
             </div>
           </SectionItem>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-32">
-            {projectsData.map((project, index) => (
-              <SectionItem key={index} delay={index * 150}>
+            {(showAllProjects ? projectsData : projectsData.slice(0, 6)).map((project, index) => (
+              <SectionItem key={index} delay={Math.min(index, 5) * 150}>
                 
                 {/* PROJE KARTI (Tıklanabilir yapıldı) */}
                 <div 
@@ -617,7 +654,8 @@ export default function App() {
                     <img 
                       src={project.image} 
                       alt={project.title} 
-                      className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-60 group-hover:scale-110 transition-all duration-700"
+                      className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-70 group-hover:scale-110 transition-all duration-700"
+                      onError={(e) => { e.target.style.display = 'none'; }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-90 group-hover:opacity-40 transition-opacity duration-500" />
                     <div className="relative z-10 bg-black/40 p-4 rounded-full backdrop-blur-sm border border-white/5 group-hover:border-white/20 transition-all duration-500">
@@ -625,7 +663,7 @@ export default function App() {
                     </div>
                   </div>
                   <div className="p-6 flex-1 flex flex-col relative z-10 bg-[#050505]">
-                    <div className="flex justify-between items-start mb-4">
+                    <div className="flex justify-between items-start mb-3">
                       <h3 className="text-xl font-bold group-hover:text-[#00F5FF] transition-colors pr-4">{project.title}</h3>
                       
                       {/* GitHub İkonu (Projeyi açmadan direkt GitHub'a gider) */}
@@ -634,12 +672,13 @@ export default function App() {
                         target="_blank" 
                         rel="noreferrer" 
                         onClick={(e) => e.stopPropagation()} 
-                        className="text-gray-400 hover:text-white transition-colors"
+                        className="text-gray-400 hover:text-white transition-colors flex-shrink-0"
                       >
                         <GithubIcon size={20} />
                       </a>
                     </div>
-                    <p className="text-gray-400 text-sm mb-6 flex-1">
+                    {/* Proje kısa açıklama yazısı */}
+                    <p className="text-gray-400 text-sm leading-relaxed mb-5 flex-1 border-l-2 border-[#00F5FF]/20 pl-3">
                       {project.desc}
                     </p>
                     <div className="flex flex-wrap gap-2 mt-auto">
