@@ -1,32 +1,71 @@
-/* Global Scrollbar & Utility Styles */
-::-webkit-scrollbar { 
-  width: 8px; 
-}
-::-webkit-scrollbar-track { 
-  background: #0D0D0D; 
-}
-::-webkit-scrollbar-thumb { 
-  background: #333; 
-  border-radius: 4px; 
-}
-::-webkit-scrollbar-thumb:hover { 
-  background: #00F5FF; 
+/* ── Global Scrollbar ─────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb { background: rgba(0,245,255,0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,245,255,0.5); }
+
+/* ── Reset cursor for OS theme ────────────────────────── */
+* { cursor: default !important; box-sizing: border-box; }
+a, button, [role="button"] { cursor: pointer !important; }
+input, textarea { cursor: text !important; }
+
+/* ── Boot screen animations ───────────────────────────── */
+@keyframes bootLineIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
+/* ── Window animations ────────────────────────────────── */
+@keyframes windowOpen {
+  from { opacity: 0; transform: scale(0.88) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── Notification slide in ────────────────────────────── */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Start menu slide up ──────────────────────────────── */
+@keyframes slideUpMenu {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Context menu ─────────────────────────────────────── */
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Spinner ──────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Pulse (for boot/welcome) ─────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+/* ── Browser loading bar ──────────────────────────────── */
+@keyframes loadingBar {
+  0%   { width: 0%;   margin-left: 0; }
+  50%  { width: 70%;  margin-left: 15%; }
+  100% { width: 0%;   margin-left: 100%; }
+}
+
+/* ── bg-grid utility ──────────────────────────────────── */
 .bg-grid {
   background-size: 40px 40px;
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-image:
+    linear-gradient(to right,  rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
   mask-image: radial-gradient(circle at center, black, transparent 80%);
   -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
 }
 
-/* Sadece fare destekleyen (dokunmatik olmayan) ekranlarda özel imleç için ana imleci gizle */
-@media (hover: hover) and (pointer: fine) {
-  body { 
-    cursor: none; 
-  }
-  a, button, input, .cursor-pointer, .group { 
-    cursor: none !important; 
-  }
-}
+/* ── Remove blue outline on everything ───────────────── */
+*:focus { outline: none; }
