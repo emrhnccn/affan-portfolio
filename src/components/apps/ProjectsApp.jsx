@@ -1,54 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import { ExternalLink, Folder, FolderOpen, ArrowLeft, Code, MessageSquare, Database, Gamepad2, Monitor, Cpu, LayoutDashboard, Globe } from 'lucide-react';
+import { useState } from 'react';
+import { ExternalLink, Folder, ArrowLeft, Code, MessageSquare, Database, Gamepad2, Monitor, Cpu, LayoutDashboard, Globe } from 'lucide-react';
 
-const FALLBACK_PROJECTS = [
+const PROJECTS = [
   {
     id: 1, name: 'real-time-chat', title: 'Gerçek Zamanlı Mesajlaşma',
     desc: 'Node.js ve Socket.io ile inşa edilmiş anlık mesajlaşma uygulaması. Kullanıcılar oda bazlı sohbet edebilir, mesaj geçmişi MongoDB\'de saklanır.',
     longDesc: 'Kullanıcılar arası iletişim için Node.js ve Socket.io kullanarak geliştirdiğim düşük gecikmeli mesajlaşma altyapısıdır. MongoDB ile sohbet geçmişini modelledim. Projeyi Ngrok ve Vercel ile canlı ortama taşıyıp responsive bir arayüz entegre ettim.',
     tags: ['Node.js', 'Socket.io', 'MongoDB', 'Tailwind CSS'],
-    icon: MessageSquare, iconColor: '#00F5FF', image: '/images/proje1.png',
-    github: 'https://github.com/emrhnccn',
+    icon: MessageSquare, iconColor: '#00F5FF', image: '/images/proje1.webp',
+    github: null,
+    repoStatus: 'Depo bağlantısı henüz paylaşılmadı',
   },
   {
     id: 2, name: 'restaurant-system', title: 'Restoran Rezervasyon Sistemi',
     desc: 'React + Node.js tabanlı kapasite ve masa yönetim sistemi. Müşteriler anlık boş masaları görebilir, yönetici paneli doluluk analizleri sunar.',
     longDesc: 'Restoranlar için özel olarak geliştirilmiş kapasite yönetim sistemidir. Dinamik masa durumu ve rezervasyon takibini içerir. Yönetici panelinde rezervasyon ve doluluk analizleri sunan güvenli bir yapı tasarladım.',
     tags: ['React', 'Node.js', 'Express', 'Algoritmik Planlama'],
-    icon: LayoutDashboard, iconColor: '#FF00C8', image: '/images/proje2.png',
-    github: 'https://github.com/emrhnccn',
+    icon: LayoutDashboard, iconColor: '#FF00C8', image: '/images/proje2.webp',
+    github: null,
+    repoStatus: 'Depo bağlantısı henüz paylaşılmadı',
+    liveDemo: 'https://salaascaferestaurant.com.tr',
   },
   {
     id: 3, name: 'kyk-automation', title: 'KYK Yurt Otomasyonu',
     desc: 'MySQL üzerine kurulu yurt yönetim sistemi. Öğrenci kayıt, oda atama, yemekhane hakkı ve kapasite takibini algoritmik olarak yönetir.',
     longDesc: 'Sistem mimarisini tamamen kendim tasarladığım bir otomasyon sistemidir. MySQL kullanarak öğrenci, oda ve kapasite bilgilerini yöneten kompleks ilişkisel veritabanı oluşturdum. Yemekhane hakları ve oda doluluk oranlarını algoritmik olarak takip eder.',
     tags: ['Node.js', 'MySQL', 'RDBMS', 'API Geliştirme'],
-    icon: Database, iconColor: '#00F5FF', image: '/images/proje3.png',
-    github: 'https://github.com/emrhnccn',
+    icon: Database, iconColor: '#00F5FF', image: '/images/proje3.webp',
+    github: null,
+    repoStatus: 'Depo bağlantısı henüz paylaşılmadı',
   },
   {
     id: 4, name: 'coop-puzzle', title: '3D Co-op Bulmaca Oyunu',
     desc: 'Unity 3D ile geliştirilmiş iki oyunculu co-op bulmaca oyunu. Rigidbody fiziği, Raycast etkileşimleri ve karakter senkronizasyonu içerir.',
     longDesc: 'İki oyuncunun eşzamanlı etkileşimine dayalı 3D bulmaca mekanikleri içeren Unity oyunumdur. Karakterler arası veri senkronizasyonu sağlandı. Clean Code prensipleriyle bellek optimizasyonu yapıldı.',
     tags: ['Unity 3D', 'C#', 'Level Design', 'Fizik Motoru'],
-    icon: Gamepad2, iconColor: '#FF00C8', image: '/images/proje4.png',
-    github: 'https://github.com/emrhnccn',
+    icon: Gamepad2, iconColor: '#FF00C8', image: '/images/proje4.webp',
+    github: null,
+    repoStatus: 'Depo bağlantısı henüz paylaşılmadı',
   },
   {
     id: 5, name: 'match3-game', title: 'Kampüs Temalı Match-3',
     desc: 'Üniversite bitirme projesi. Blender ile modellenen kampüs binaları Unity\'ye entegre edilmiş, C# ile Match-3 algoritmaları yazılmıştır.',
     longDesc: 'Üniversite bitirme projem olarak hazırladığım Kampüs temalı Match-3 oyunu. Blender ile kampüs binalarını modelleyip Unity\'ye dinamik level haritası olarak entegre ettim. API üzerinden Leaderboard kurdum.',
     tags: ['Unity', 'C#', 'Blender', 'Backend API'],
-    icon: Monitor, iconColor: '#00F5FF', image: '/images/proje5.png',
-    github: 'https://github.com/emrhnccn',
+    icon: Monitor, iconColor: '#00F5FF', image: '/images/proje5.webp',
+    github: null,
+    repoStatus: 'Depo bağlantısı henüz paylaşılmadı',
   },
   {
     id: 6, name: 'ai-automation', title: 'AI & Veri Otomasyonları',
     desc: 'LLM API entegrasyonu ile dinamik içerik üreten ve Web Scraping botlarıyla veri toplayan Ar-Ge projeleri.',
     longDesc: 'LLM (Yapay Zeka API\'leri) entegrasyonuyla dinamik içerik üreten sistemler ve Web Scraping ile internetten veri toplayan botlar tasarladım. Tekrarlayan görevleri otomatize ederek süreçleri hızlandırır.',
     tags: ['LLM API', 'Node.js', 'Web Scraping', 'Otomasyon'],
-    icon: Cpu, iconColor: '#FF00C8', image: '/images/proje6.png',
-    github: 'https://github.com/emrhnccn',
+    icon: Cpu, iconColor: '#FF00C8', image: '/images/proje6.webp',
+    github: null,
+    repoStatus: 'Depo bağlantısı henüz paylaşılmadı',
   },
   {
     id: 7, name: 'pendikcekici', title: 'Pendik Çekici Hizmetleri',
@@ -57,6 +64,7 @@ const FALLBACK_PROJECTS = [
     tags: ['HTML', 'CSS', 'SEO', 'Kurumsal Site'],
     icon: Globe, iconColor: '#00F5FF', image: null,
     github: 'https://github.com/emrhnccn/pendikcekici',
+    liveDemo: 'https://pendikcekici.vercel.app',
   },
   {
     id: 8, name: 'BereketSisesiGit', title: 'Bereket Sesi (v1)',
@@ -64,7 +72,9 @@ const FALLBACK_PROJECTS = [
     longDesc: 'Bereket Sesi markası için hazırladığım ilk versiyon kurumsal web sitesidir. Bu versiyon üzerine iterasyonlar yapılarak daha gelişmiş sürümlere geçilmiştir.',
     tags: ['Web Sitesi', 'Kurumsal', 'Marka', 'UI/UX'],
     icon: Globe, iconColor: '#FF00C8', image: null,
-    github: 'https://github.com/emrhnccn/BereketSisesiGit',
+    github: null,
+    repoStatus: 'Kaynak kodu yakında paylaşılacak',
+    liveDemo: 'https://bereketsisesi.vercel.app',
   },
   {
     id: 9, name: 'aiflix', title: 'AIFlix',
@@ -81,6 +91,7 @@ const FALLBACK_PROJECTS = [
     tags: ['TypeScript', 'POS', 'Restoran Yönetimi', 'Dashboard'],
     icon: LayoutDashboard, iconColor: '#FF00C8', image: null,
     github: 'https://github.com/emrhnccn/GustoPos',
+    liveDemo: 'https://gusto-pos-two.vercel.app',
   },
 ];
 
@@ -152,50 +163,63 @@ function ProjectDetail({ project, onBack }) {
         ))}
       </div>
 
-      <a
-        href={project.github} target="_blank" rel="noreferrer"
-        style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-          padding: '12px', borderRadius: '8px',
-          background: 'rgba(0,245,255,0.08)', border: '1px solid rgba(0,245,255,0.25)',
-          color: '#00F5FF', fontSize: '13px', fontWeight: 600,
-          textDecoration: 'none', transition: 'all 0.2s',
-        }}
-        onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,245,255,0.15)'}
-        onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,245,255,0.08)'}
-      >
-        <ExternalLink size={16} /> GitHub\'da İncele
-      </a>
+      <div style={{ display: 'grid', gap: '8px' }}>
+        {project.liveDemo && (
+          <a
+            href={project.liveDemo} target="_blank" rel="noreferrer"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              padding: '12px', borderRadius: '8px',
+              background: 'rgba(255,0,200,0.08)', border: '1px solid rgba(255,0,200,0.25)',
+              color: '#FF00C8', fontSize: '13px', fontWeight: 600,
+              textDecoration: 'none', transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,0,200,0.15)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,0,200,0.08)'}
+          >
+            <ExternalLink size={16} aria-hidden="true" /> Canlı Demoyu Aç
+          </a>
+        )}
+
+        {project.github ? (
+          <a
+            href={project.github} target="_blank" rel="noreferrer"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              padding: '12px', borderRadius: '8px',
+              background: 'rgba(0,245,255,0.08)', border: '1px solid rgba(0,245,255,0.25)',
+              color: '#00F5FF', fontSize: '13px', fontWeight: 600,
+              textDecoration: 'none', transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,245,255,0.15)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,245,255,0.08)'}
+          >
+            <ExternalLink size={16} aria-hidden="true" /> GitHub'da İncele
+          </a>
+        ) : (
+          <button
+            type="button"
+            disabled
+            title={project.repoStatus}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              padding: '12px', borderRadius: '8px',
+              background: 'rgba(148,163,184,0.05)', border: '1px solid rgba(148,163,184,0.14)',
+              color: '#64748b', fontSize: '13px', fontWeight: 600,
+              cursor: 'not-allowed', opacity: 0.85,
+            }}
+          >
+            <Code size={16} aria-hidden="true" /> {project.repoStatus}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
 
 export default function ProjectsApp() {
-  const [projects, setProjects] = useState(FALLBACK_PROJECTS);
   const [selected, setSelected] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch('https://api.github.com/users/emrhnccn/repos?sort=updated&per_page=100');
-        if (res.ok) {
-          const data = await res.json();
-          const filtered = data.filter(r => !r.fork);
-          if (filtered.length > 0) {
-            const merged = FALLBACK_PROJECTS.map((fp, i) => {
-              const repo = filtered.find(r => r.full_name.includes(fp.name)) || filtered[i];
-              return repo ? { ...fp, github: repo.html_url } : fp;
-            });
-            setProjects(merged);
-          }
-        }
-      } catch {}
-      setLoading(false);
-    })();
-  }, []);
-
-  useEffect(() => { setLoading(false); }, []);
+  const projects = PROJECTS;
 
   if (selected) {
     return <ProjectDetail project={selected} onBack={() => setSelected(null)} />;
@@ -227,10 +251,12 @@ export default function ProjectsApp() {
         {projects.map((project) => {
           const IconComp = project.icon;
           return (
-            <div
+            <button
+              type="button"
               key={project.id}
-              onDoubleClick={() => setSelected(project)}
-              title={`${project.title} — çift tıkla`}
+              onClick={() => setSelected(project)}
+              aria-label={`${project.title} ayrıntılarını aç`}
+              title={`${project.title} ayrıntılarını aç`}
               style={{
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', gap: '8px',
@@ -239,6 +265,8 @@ export default function ProjectsApp() {
                 transition: 'all 0.15s',
                 border: '1px solid transparent',
                 userSelect: 'none',
+                background: 'transparent',
+                font: 'inherit',
               }}
               onMouseEnter={e => {
                 e.currentTarget.style.background = 'rgba(0,245,255,0.07)';
@@ -247,6 +275,16 @@ export default function ProjectsApp() {
               onMouseLeave={e => {
                 e.currentTarget.style.background = 'transparent';
                 e.currentTarget.style.border = '1px solid transparent';
+              }}
+              onFocus={e => {
+                e.currentTarget.style.background = 'rgba(0,245,255,0.07)';
+                e.currentTarget.style.border = '1px solid rgba(0,245,255,0.45)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(0,245,255,0.18)';
+              }}
+              onBlur={e => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.border = '1px solid transparent';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             >
               {/* Folder icon with inner icon */}
@@ -268,7 +306,7 @@ export default function ProjectsApp() {
               }}>
                 {project.title}
               </span>
-            </div>
+            </button>
           );
         })}
       </div>
@@ -279,7 +317,7 @@ export default function ProjectsApp() {
         borderTop: '1px solid rgba(255,255,255,0.05)',
         color: '#475569', fontSize: '11px', fontFamily: 'monospace',
       }}>
-        {projects.length} öğe · Açmak için çift tıklayın
+        {projects.length} öğe · Açmak için seçin
       </div>
     </div>
   );

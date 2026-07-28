@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import StartMenu from './StartMenu';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -24,8 +24,10 @@ function useSystemStats() {
   return { cpu: Math.round(cpu), ram: ram.toFixed(1) };
 }
 
-export default function Taskbar({ windows, apps, onOpenApp, onFocusWindow, onToggleMinimize, muted, onToggleMute }) {
+export default function Taskbar({ windows, apps, onOpenApp, onToggleMinimize, muted, onToggleMute }) {
   const [startOpen, setStartOpen] = useState(false);
+  const startButtonRef = useRef(null);
+  const wasStartOpenRef = useRef(false);
   const time = useClock();
   const { cpu, ram } = useSystemStats();
   const { theme } = useTheme();
@@ -34,7 +36,14 @@ export default function Taskbar({ windows, apps, onOpenApp, onFocusWindow, onTog
   const formatDate = (d) => d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' });
 
   const cpuColor = cpu > 70 ? '#f87171' : cpu > 40 ? '#facc15' : theme.primary;
-  const openWindows = windows.filter(w => !w.isMinimized || true); // show all in taskbar
+  const openWindows = windows;
+
+  useEffect(() => {
+    if (wasStartOpenRef.current && !startOpen) {
+      startButtonRef.current?.focus();
+    }
+    wasStartOpenRef.current = startOpen;
+  }, [startOpen]);
 
   return (
     <>
@@ -47,6 +56,9 @@ export default function Taskbar({ windows, apps, onOpenApp, onFocusWindow, onTog
       )}
 
       <div
+        className="taskbar"
+        role="navigation"
+        aria-label="AffanOS görev çubuğu"
         style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
           height: '48px', zIndex: 990,
@@ -60,7 +72,12 @@ export default function Taskbar({ windows, apps, onOpenApp, onFocusWindow, onTog
       >
         {/* Start button */}
         <button
+          ref={startButtonRef}
+          type="button"
           onClick={() => setStartOpen(o => !o)}
+          aria-label="Başlat menüsünü aç"
+          aria-expanded={startOpen}
+          aria-controls="start-menu"
           title="Başlat"
           style={{
             width: '38px', height: '34px', borderRadius: '8px',
@@ -80,12 +97,14 @@ export default function Taskbar({ windows, apps, onOpenApp, onFocusWindow, onTog
         <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
 
         {/* Open windows */}
-        <div style={{ flex: 1, display: 'flex', gap: '4px', overflow: 'hidden' }}>
+        <div className="taskbar-windows" style={{ flex: 1, display: 'flex', gap: '4px', overflow: 'hidden' }}>
           {/* Taskbar window buttons */}
           {openWindows.map(win => (
             <button
+              type="button"
               key={win.id}
               onClick={() => onToggleMinimize(win.id)}
+              aria-label={`${win.title} penceresini ${win.isMinimized ? 'geri getir' : 'küçült'}`}
               title={win.title}
               style={{
                 display: 'flex', alignItems: 'center', gap: '6px',
@@ -121,13 +140,13 @@ export default function Taskbar({ windows, apps, onOpenApp, onFocusWindow, onTog
         </div>
 
         {/* System indicators */}
-        <div style={{
+        <div className="taskbar-system" style={{
           display: 'flex', alignItems: 'center', gap: '12px',
           flexShrink: 0, paddingLeft: '8px',
           borderLeft: '1px solid rgba(255,255,255,0.06)',
         }}>
           {/* CPU */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+          <div className="taskbar-stat" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
             <div style={{ display: 'flex', gap: '3px', alignItems: 'center' }}>
               <span style={{ color: '#475569', fontSize: '9px', letterSpacing: '0.05em' }}>CPU</span>
               <span style={{ color: cpuColor, fontSize: '10px', fontFamily: 'monospace', fontWeight: 700 }}>
@@ -145,7 +164,7 @@ export default function Taskbar({ windows, apps, onOpenApp, onFocusWindow, onTog
           </div>
 
           {/* RAM */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+          <div className="taskbar-stat" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
             <div style={{ display: 'flex', gap: '3px', alignItems: 'center' }}>
               <span style={{ color: '#475569', fontSize: '9px', letterSpacing: '0.05em' }}>RAM</span>
               <span style={{ color: theme.primary, fontSize: '10px', fontFamily: 'monospace', fontWeight: 700 }}>
@@ -163,14 +182,16 @@ export default function Taskbar({ windows, apps, onOpenApp, onFocusWindow, onTog
           </div>
 
           {/* Projects */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+          <div className="taskbar-stat" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
             <span style={{ color: '#475569', fontSize: '9px', letterSpacing: '0.05em' }}>PROJE</span>
             <span style={{ color: theme.secondary, fontSize: '12px', fontFamily: 'monospace', fontWeight: 700 }}>10</span>
           </div>
 
           {/* Mute button */}
           <button
+            type="button"
             onClick={onToggleMute}
+            aria-label={muted ? 'Sesi aç' : 'Sesi kapat'}
             title={muted ? 'Sesi Aç' : 'Sesi Kapat'}
             style={{
               width: '28px', height: '28px', borderRadius: '6px',
@@ -188,6 +209,7 @@ export default function Taskbar({ windows, apps, onOpenApp, onFocusWindow, onTog
 
           {/* Clock */}
           <div
+            className="taskbar-clock"
             style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center',
               padding: '4px 10px', borderRadius: '6px',

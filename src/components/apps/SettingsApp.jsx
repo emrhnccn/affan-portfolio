@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTheme, THEMES, WALLPAPERS, SPEEDS } from '../../contexts/ThemeContext';
 
 function WallpaperPreview({ id, primary }) {

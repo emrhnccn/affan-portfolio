@@ -81,7 +81,11 @@ export function useSounds(muted) {
     if (muted) return;
     const fn = SOUNDS[name];
     if (!fn) return;
-    try { fn(ensureCtx()); } catch {}
+    try {
+      fn(ensureCtx());
+    } catch {
+      // Audio is optional; browsers may block it until a user gesture.
+    }
   }, [muted, ensureCtx]);
 
   return { play };

@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
-import { Mail, Send, Inbox, FileText, Star, Trash2, CheckCircle, Loader } from 'lucide-react';
+import { useState } from 'react';
+import { Mail, Send, Inbox, FileText, Star, Trash2, Copy, Check } from 'lucide-react';
+
+const CONTACT_EMAIL = 'emrhn.ccn@gmail.com';
+const EMPTY_FORM = { name: '', email: '', subject: '', body: '' };
 
 const INBOX_MESSAGES = [
   {
@@ -59,27 +62,13 @@ const SIDEBAR_ITEMS = [
   { icon: Trash2,   label: 'Çöp Kutusu' },
 ];
 
-function EmptyState({ folder }) {
-  const map = {
-    'Gönderilmiş': { icon: '📤', text: 'Henüz gönderilen mesaj yok.' },
-    'Önemli': { icon: '⭐', text: 'Önemli olarak işaretlenen mesaj yok.' },
-    'Çöp Kutusu': { icon: '🗑️', text: 'Çöp kutusu boş.' },
-  };
-  const info = map[folder] || { icon: '📭', text: 'Bu klasör boş.' };
-  return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-      <div style={{ fontSize: '36px' }}>{info.icon}</div>
-      <p style={{ color: '#334155', fontSize: '13px', margin: 0 }}>{info.text}</p>
-    </div>
-  );
-}
-
 export default function ContactApp() {
   const [activeFolder, setActiveFolder] = useState('Gelen Kutusu');
   const [selectedMsg, setSelectedMsg] = useState(null);
-  const [composing, setComposing] = useState(false);
-  const [form, setForm] = useState({ subject: '', body: '' });
+  const [composing, setComposing] = useState(true);
+  const [form, setForm] = useState(EMPTY_FORM);
   const [sendState, setSendState] = useState('idle');
+  const [copyState, setCopyState] = useState('idle');
 
   const currentMessages = FOLDER_MAP[activeFolder] || [];
 
@@ -91,7 +80,13 @@ export default function ContactApp() {
 
   const handleSelectMsg = (msg) => {
     if (msg.isDraft) {
-      setForm({ subject: msg.subject.replace(' [Taslak]', ''), body: msg.body });
+      setForm({
+        ...EMPTY_FORM,
+        subject: msg.subject.replace(' [Taslak]', ''),
+        body: msg.body,
+      });
+      setSendState('idle');
+      setCopyState('idle');
       setComposing(true);
       setSelectedMsg(null);
     } else {
@@ -99,30 +94,67 @@ export default function ContactApp() {
     }
   };
 
-  const handleSend = async () => {
-    if (!form.subject || !form.body) return;
-    setSendState('sending');
-    await new Promise(r => setTimeout(r, 2000));
-    setSendState('sent');
-    setTimeout(() => {
-      setSendState('idle');
-      setComposing(false);
-      setForm({ subject: '', body: '' });
-    }, 2500);
+  const openComposer = (nextForm = EMPTY_FORM) => {
+    setForm(nextForm);
+    setSendState('idle');
+    setCopyState('idle');
+    setComposing(true);
+    setSelectedMsg(null);
+  };
+
+  const updateFormField = (field, value) => {
+    setForm(currentForm => ({ ...currentForm, [field]: value }));
+    setSendState('idle');
+  };
+
+  const handleSend = (event) => {
+    event.preventDefault();
+
+    const emailBody = [
+      `Merhaba Affan Emirhan,`,
+      '',
+      form.body.trim(),
+      '',
+      '---',
+      `Gönderen: ${form.name.trim()}`,
+      `Yanıt e-postası: ${form.email.trim()}`,
+    ].join('\n');
+    const mailtoUrl = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(form.subject.trim())}&body=${encodeURIComponent(emailBody)}`;
+
+    setSendState('draft-opened');
+    window.location.href = mailtoUrl;
+  };
+
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(CONTACT_EMAIL);
+      setCopyState('copied');
+    } catch {
+      setCopyState('failed');
+    }
   };
 
   return (
-    <div style={{ height: '100%', display: 'flex', overflow: 'hidden' }}>
+    <div className="contact-app" style={{ height: '100%', display: 'flex', overflow: 'hidden' }}>
       {/* Sidebar */}
-      <div style={{
+      <div className="contact-sidebar" style={{
         width: '180px', flexShrink: 0,
         borderRight: '1px solid rgba(255,255,255,0.06)',
         display: 'flex', flexDirection: 'column',
         background: 'rgba(255,255,255,0.02)',
         padding: '12px 0',
       }}>
+        <div className="contact-demo-label" style={{
+          padding: '0 14px 10px',
+          color: '#475569', fontSize: '9px', fontFamily: 'monospace',
+          letterSpacing: '0.08em',
+        }}>
+          ÖRNEK POSTA KUTUSU
+        </div>
         <button
-          onClick={() => { setComposing(true); setSelectedMsg(null); setForm({ subject: '', body: '' }); }}
+          type="button"
+          className="contact-compose-launch"
+          onClick={() => openComposer()}
           style={{
             margin: '0 12px 16px',
             padding: '10px', borderRadius: '8px',
@@ -144,6 +176,8 @@ export default function ContactApp() {
           const count = FOLDER_COUNTS[item.label] || 0;
           return (
             <button
+              type="button"
+              className="contact-folder-button"
               key={item.label}
               onClick={() => handleFolderChange(item.label)}
               style={{
@@ -174,7 +208,7 @@ export default function ContactApp() {
 
       {/* Message list */}
       {!composing && (
-        <div style={{
+        <div className="contact-message-list" style={{
           width: '240px', flexShrink: 0,
           borderRight: '1px solid rgba(255,255,255,0.06)',
           overflowY: 'auto',
@@ -187,7 +221,7 @@ export default function ContactApp() {
             background: 'rgba(255,255,255,0.02)',
             flexShrink: 0,
           }}>
-            {activeFolder} — {currentMessages.length} mesaj
+            Örnek {activeFolder} — {currentMessages.length} mesaj
           </div>
 
           {currentMessages.length === 0 ? (
@@ -196,10 +230,13 @@ export default function ContactApp() {
             </div>
           ) : (
             currentMessages.map(msg => (
-              <div
+              <button
+                type="button"
                 key={msg.id}
                 onClick={() => handleSelectMsg(msg)}
+                aria-label={`${msg.subject} mesajını aç`}
                 style={{
+                  width: '100%', border: 'none', textAlign: 'left',
                   padding: '12px 14px',
                   borderBottom: '1px solid rgba(255,255,255,0.04)',
                   cursor: 'pointer',
@@ -230,79 +267,195 @@ export default function ContactApp() {
                     background: 'rgba(250,204,21,0.1)', borderRadius: '4px', padding: '1px 6px',
                   }}>Taslak</span>
                 )}
-              </div>
+              </button>
             ))
           )}
         </div>
       )}
 
       {/* Content area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="contact-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {composing ? (
           /* Compose */
-          <div style={{ flex: 1, padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ color: '#94a3b8', fontSize: '12px', fontFamily: 'monospace', marginBottom: '4px' }}>
-              Yeni Mesaj — emrhn.ccn@gmail.com
+          <form
+            onSubmit={handleSend}
+            aria-labelledby="contact-compose-title"
+            style={{
+              flex: 1, padding: '20px', display: 'flex', flexDirection: 'column',
+              gap: '12px', overflowY: 'auto',
+            }}
+          >
+            <div>
+              <h2
+                id="contact-compose-title"
+                style={{
+                  color: '#94a3b8', fontSize: '12px', fontFamily: 'monospace',
+                  fontWeight: 500, margin: '0 0 5px',
+                }}
+              >
+                Yeni Mesaj
+              </h2>
+              <p style={{ color: '#64748b', fontSize: '11px', lineHeight: 1.5, margin: 0 }}>
+                Bilgileriniz e-posta uygulamanızda bir taslağa dönüştürülür.
+                Gönderimi e-posta uygulamanızda siz tamamlarsınız.
+              </p>
             </div>
-            {[
-              { label: 'Kimden', value: 'Misafir <misafir@affanos.dev>', readOnly: true },
-              { label: 'Kime', value: 'emrhn.ccn@gmail.com', readOnly: true },
-            ].map(field => (
-              <div key={field.label} style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '10px' }}>
-                <span style={{ color: '#475569', fontSize: '12px', width: '60px', flexShrink: 0 }}>{field.label}:</span>
-                <span style={{ color: '#64748b', fontSize: '12px' }}>{field.value}</span>
-              </div>
-            ))}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '10px' }}>
-              <span style={{ color: '#475569', fontSize: '12px', width: '60px', flexShrink: 0 }}>Konu:</span>
+
+            <div
+              style={{
+                display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px',
+                borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '10px',
+              }}
+            >
+              <span style={{ color: '#475569', fontSize: '12px' }}>Alıcı:</span>
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                style={{ color: '#00F5FF', fontSize: '12px', textDecoration: 'none' }}
+              >
+                {CONTACT_EMAIL}
+              </a>
+              <button
+                type="button"
+                onClick={handleCopyEmail}
+                aria-label={`${CONTACT_EMAIL} adresini kopyala`}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '5px',
+                  padding: '5px 8px', borderRadius: '6px',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: copyState === 'copied' ? '#4ade80' : '#64748b',
+                  fontSize: '11px', cursor: 'pointer',
+                }}
+              >
+                {copyState === 'copied'
+                  ? <Check size={12} aria-hidden="true" />
+                  : <Copy size={12} aria-hidden="true" />}
+                {copyState === 'copied' ? 'Kopyalandı' : 'Kopyala'}
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label htmlFor="contact-name" style={{ color: '#64748b', fontSize: '12px' }}>
+                Adınız
+              </label>
               <input
-                value={form.subject}
-                onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
-                placeholder="Konu giriniz..."
-                style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: '#e2e8f0', fontSize: '12px', cursor: 'text' }}
+                id="contact-name"
+                name="name"
+                type="text"
+                required
+                autoComplete="name"
+                value={form.name}
+                onChange={event => updateFormField('name', event.target.value)}
+                placeholder="Adınız ve soyadınız"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.1)', borderRadius: '7px',
+                  padding: '9px 10px', color: '#e2e8f0', fontSize: '12px',
+                  fontFamily: 'inherit', cursor: 'text',
+                }}
               />
             </div>
-            <textarea
-              value={form.body}
-              onChange={e => setForm(f => ({ ...f, body: e.target.value }))}
-              placeholder="Mesajınızı yazın..."
-              style={{
-                flex: 1, background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px',
-                padding: '12px', color: '#e2e8f0', fontSize: '13px',
-                resize: 'none', outline: 'none', lineHeight: 1.6, fontFamily: 'inherit', cursor: 'text',
-              }}
-            />
-            {sendState === 'sending' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#00F5FF', fontSize: '12px', fontFamily: 'monospace' }}>
-                <Loader size={14} style={{ animation: 'spin 1s linear infinite' }} />
-                Mesaj geliştirici sunucusuna iletiliyor...
-              </div>
-            )}
-            {sendState === 'sent' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#4ade80', fontSize: '12px', fontFamily: 'monospace' }}>
-                <CheckCircle size={14} />
-                ✓ Mesaj başarıyla teslim edildi.
-              </div>
-            )}
-            <div style={{ display: 'flex', gap: '10px' }}>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label htmlFor="contact-email" style={{ color: '#64748b', fontSize: '12px' }}>
+                E-posta adresiniz
+              </label>
+              <input
+                id="contact-email"
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                inputMode="email"
+                value={form.email}
+                onChange={event => updateFormField('email', event.target.value)}
+                placeholder="ornek@eposta.com"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.1)', borderRadius: '7px',
+                  padding: '9px 10px', color: '#e2e8f0', fontSize: '12px',
+                  fontFamily: 'inherit', cursor: 'text',
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label htmlFor="contact-subject" style={{ color: '#64748b', fontSize: '12px' }}>
+                Konu
+              </label>
+              <input
+                id="contact-subject"
+                name="subject"
+                type="text"
+                required
+                value={form.subject}
+                onChange={event => updateFormField('subject', event.target.value)}
+                placeholder="Mesajınızın konusu"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.1)', borderRadius: '7px',
+                  padding: '9px 10px', color: '#e2e8f0', fontSize: '12px',
+                  fontFamily: 'inherit', cursor: 'text',
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flex: 1, minHeight: '150px', flexDirection: 'column', gap: '6px' }}>
+              <label htmlFor="contact-message" style={{ color: '#64748b', fontSize: '12px' }}>
+                Mesajınız
+              </label>
+              <textarea
+                id="contact-message"
+                name="message"
+                required
+                value={form.body}
+                onChange={event => updateFormField('body', event.target.value)}
+                placeholder="Mesajınızı yazın..."
+                style={{
+                  flex: 1, minHeight: '120px', background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px',
+                  padding: '12px', color: '#e2e8f0', fontSize: '13px',
+                  resize: 'vertical', lineHeight: 1.6, fontFamily: 'inherit', cursor: 'text',
+                }}
+              />
+            </div>
+
+            <div aria-live="polite" role="status" style={{ minHeight: '18px' }}>
+              {sendState === 'draft-opened' && (
+                <p style={{ color: '#4ade80', fontSize: '12px', lineHeight: 1.5, margin: 0 }}>
+                  E-posta taslağı açma isteği gönderildi. Gönderimi e-posta uygulamanızda tamamlayın.
+                </p>
+              )}
+              {copyState === 'failed' && (
+                <p style={{ color: '#facc15', fontSize: '12px', lineHeight: 1.5, margin: 0 }}>
+                  Adres otomatik kopyalanamadı. Yukarıdaki e-posta bağlantısını kullanabilirsiniz.
+                </p>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               <button
-                onClick={handleSend}
-                disabled={sendState !== 'idle'}
+                type="submit"
                 style={{
                   display: 'flex', alignItems: 'center', gap: '6px',
                   padding: '10px 20px', borderRadius: '8px',
-                  background: sendState !== 'idle' ? 'rgba(0,245,255,0.05)' : 'rgba(0,245,255,0.12)',
+                  background: 'rgba(0,245,255,0.12)',
                   border: '1px solid rgba(0,245,255,0.3)', color: '#00F5FF',
                   fontSize: '13px', fontWeight: 600,
-                  cursor: sendState !== 'idle' ? 'not-allowed' : 'pointer', transition: 'all 0.2s',
+                  cursor: 'pointer', transition: 'all 0.2s',
                 }}
               >
-                <Send size={14} />
-                {sendState === 'sending' ? 'Gönderiliyor...' : sendState === 'sent' ? 'Gönderildi!' : 'Gönder'}
+                <Send size={14} aria-hidden="true" />
+                E-posta Taslağını Aç
               </button>
               <button
-                onClick={() => { setComposing(false); setForm({ subject: '', body: '' }); }}
+                type="button"
+                onClick={() => {
+                  setComposing(false);
+                  setForm(EMPTY_FORM);
+                  setSendState('idle');
+                  setCopyState('idle');
+                }}
                 style={{
                   padding: '10px 16px', borderRadius: '8px', background: 'transparent',
                   border: '1px solid rgba(255,255,255,0.1)', color: '#64748b', fontSize: '13px', cursor: 'pointer',
@@ -311,7 +464,7 @@ export default function ContactApp() {
                 İptal
               </button>
             </div>
-          </div>
+          </form>
         ) : selectedMsg ? (
           /* Message detail */
           <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
@@ -339,7 +492,12 @@ export default function ContactApp() {
             </p>
             <div style={{ marginTop: '20px' }}>
               <button
-                onClick={() => { setForm({ subject: `Re: ${selectedMsg.subject}`, body: `\n\n---\nGönderen: ${selectedMsg.from}\n${selectedMsg.body}` }); setComposing(true); setSelectedMsg(null); }}
+                type="button"
+                onClick={() => openComposer({
+                  ...EMPTY_FORM,
+                  subject: `Re: ${selectedMsg.subject}`,
+                  body: `\n\n---\nGönderen: ${selectedMsg.from}\n${selectedMsg.body}`,
+                })}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '6px',
                   padding: '8px 16px', borderRadius: '8px',
@@ -359,7 +517,8 @@ export default function ContactApp() {
               {currentMessages.length > 0 ? 'Bir mesaj seçin' : 'Bu klasör boş'}
             </p>
             <button
-              onClick={() => { setComposing(true); setForm({ subject: '', body: '' }); }}
+              type="button"
+              onClick={() => openComposer()}
               style={{
                 padding: '10px 24px', borderRadius: '8px',
                 background: 'rgba(0,245,255,0.1)', border: '1px solid rgba(0,245,255,0.25)',
