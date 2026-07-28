@@ -1,11 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function StartMenu({ apps, onOpen, onClose }) {
   const [search, setSearch] = useState('');
+  const menuRef = useRef(null);
   const filtered = apps.filter(a => a.title.toLowerCase().includes(search.toLowerCase()));
 
   useEffect(() => {
-    const handleKeyDown = (e) => { if (e.key === 'Escape') onClose(); };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+
+      if (e.key !== 'Tab') return;
+      const focusable = [...(menuRef.current?.querySelectorAll(
+        'button:not([disabled]), input:not([disabled]), a[href]',
+      ) || [])];
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
@@ -17,6 +39,12 @@ export default function StartMenu({ apps, onOpen, onClose }) {
 
       {/* Menu */}
       <div
+        ref={menuRef}
+        id="start-menu"
+        className="start-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Başlat menüsü"
         style={{
           position: 'fixed', bottom: '56px', left: '8px',
           width: '300px', zIndex: 999,
@@ -42,6 +70,7 @@ export default function StartMenu({ apps, onOpen, onClose }) {
           </div>
           <input
             type="text"
+            aria-label="Uygulama ara"
             placeholder="🔍 Uygulama ara..."
             value={search}
             onChange={e => setSearch(e.target.value)}

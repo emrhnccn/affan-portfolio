@@ -8,6 +8,73 @@
 * { cursor: default !important; box-sizing: border-box; }
 a, button, [role="button"] { cursor: pointer !important; }
 input, textarea { cursor: text !important; }
+button:disabled { cursor: not-allowed !important; }
+
+/* ── Immediate portfolio introduction ─────────────────────────────────────── */
+.desktop-intro {
+  position: absolute;
+  top: 42px;
+  right: 42px;
+  width: min(430px, calc(100vw - 170px));
+  padding: 24px;
+  color: #e2e8f0;
+  background: rgba(8, 8, 18, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 18px;
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(18px);
+}
+
+.desktop-intro__eyebrow {
+  margin-bottom: 8px;
+  font: 700 10px/1.4 monospace;
+  letter-spacing: 0.16em;
+}
+
+.desktop-intro h1 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: clamp(26px, 4vw, 44px);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+.desktop-intro p {
+  max-width: 38ch;
+  margin: 14px 0 18px;
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.desktop-intro__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.desktop-intro__actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 12px;
+  color: #dbeafe;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  background: rgba(0, 245, 255, 0.08);
+  border: 1px solid rgba(0, 245, 255, 0.2);
+  border-radius: 9px;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.desktop-intro__actions button:hover {
+  background: rgba(0, 245, 255, 0.14);
+  border-color: rgba(0, 245, 255, 0.42);
+  transform: translateY(-1px);
+}
 
 /* ── Boot screen animations ───────────────────────────── */
 @keyframes bootLineIn {
@@ -67,5 +134,180 @@ input, textarea { cursor: text !important; }
   -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
 }
 
-/* ── Remove blue outline on everything ───────────────── */
-*:focus { outline: none; }
+/* ── Keyboard focus and reduced-motion support ───────────────────────────── */
+*:focus-visible {
+  outline: 2px solid #00f5ff !important;
+  outline-offset: 3px !important;
+}
+
+@media (max-width: 960px), (max-height: 700px) {
+  .app-window:not(.app-window--maximized) {
+    left: 8px !important;
+    top: 8px !important;
+    width: calc(100vw - 16px) !important;
+    height: calc(100dvh - 64px) !important;
+    max-width: none !important;
+    max-height: none !important;
+  }
+
+  .window-titlebar {
+    cursor: default !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .desktop-icon-dock {
+    top: 10px !important;
+    left: 8px !important;
+    right: 8px;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2px !important;
+  }
+
+  .desktop-icon {
+    width: 100% !important;
+    min-width: 0;
+    padding: 8px 2px !important;
+  }
+
+  .desktop-intro {
+    top: 196px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .desktop-intro h1 {
+    font-size: 25px;
+  }
+
+  .desktop-intro p {
+    margin: 10px 0 13px;
+    font-size: 12px;
+  }
+
+  .taskbar {
+    padding: 0 6px !important;
+    gap: 3px !important;
+  }
+
+  .taskbar-system {
+    gap: 3px !important;
+    padding-left: 3px !important;
+  }
+
+  .taskbar-stat {
+    display: none !important;
+  }
+
+  .taskbar-clock {
+    padding: 4px 6px !important;
+  }
+
+  .taskbar-windows button {
+    max-width: 42px !important;
+    padding: 0 8px !important;
+  }
+
+  .taskbar-windows button > span:nth-child(2),
+  .taskbar-windows button > div {
+    display: none;
+  }
+
+  .start-menu {
+    width: calc(100vw - 16px) !important;
+    max-width: 360px;
+  }
+
+  .contact-app {
+    flex-direction: column;
+  }
+
+  .contact-sidebar {
+    width: 100% !important;
+    flex-direction: row !important;
+    align-items: center;
+    padding: 7px !important;
+    overflow-x: auto;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .contact-compose-launch {
+    flex: 0 0 auto;
+    margin: 0 6px 0 0 !important;
+    white-space: nowrap;
+  }
+
+  .contact-demo-label {
+    flex: 0 0 auto;
+    padding: 0 10px 0 2px !important;
+    white-space: nowrap;
+  }
+
+  .contact-folder-button {
+    width: auto !important;
+    flex: 0 0 auto;
+    padding: 9px 11px !important;
+    white-space: nowrap;
+  }
+
+  .contact-message-list {
+    width: 100% !important;
+    height: 160px;
+    flex: 0 0 160px !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .contact-content {
+    min-height: 0;
+  }
+}
+
+@media (max-height: 500px) {
+  .desktop-icon-dock {
+    top: 8px !important;
+    left: 8px !important;
+    right: 8px;
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 2px !important;
+  }
+
+  .desktop-icon {
+    width: 100% !important;
+    padding: 6px 2px !important;
+  }
+
+  .desktop-intro {
+    top: 118px;
+    right: auto;
+    left: 20px;
+    width: min(430px, calc(100vw - 40px));
+    padding: 14px 18px;
+  }
+
+  .desktop-intro h1 {
+    font-size: 26px;
+  }
+
+  .desktop-intro p {
+    margin: 8px 0 10px;
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

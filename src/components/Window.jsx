@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 
 export default function Window({
@@ -20,11 +20,16 @@ export default function Window({
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
+  const windowRef = useRef(null);
   const { theme, speed } = useTheme();
+  const titleId = `window-title-${id}`;
 
   useEffect(() => {
     // Slight delay for mount animation
-    const t = setTimeout(() => setMounted(true), 10);
+    const t = setTimeout(() => {
+      setMounted(true);
+      windowRef.current?.focus();
+    }, 10);
     return () => clearTimeout(t);
   }, []);
 
@@ -55,10 +60,8 @@ export default function Window({
     };
   }, [isDragging, dragOffset, id, onMove]);
 
-  if (isMinimized) return null;
-
   const style = isMaximized
-    ? { left: 0, top: 0, width: '100vw', height: 'calc(100vh - 48px)', zIndex }
+    ? { left: 0, top: 0, width: '100vw', height: 'calc(100dvh - 48px)', zIndex }
     : {
         left: position.x,
         top: position.y,
@@ -69,11 +72,17 @@ export default function Window({
 
   return (
     <div
+      ref={windowRef}
+      className={`app-window${isMaximized ? ' app-window--maximized' : ''}`}
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby={titleId}
+      tabIndex={-1}
       onMouseDown={() => onFocus(id)}
       style={{
         ...style,
         position: 'fixed',
-        display: 'flex',
+        display: isMinimized ? 'none' : 'flex',
         flexDirection: 'column',
         borderRadius: isMaximized ? 0 : '10px',
         overflow: 'hidden',
@@ -89,8 +98,9 @@ export default function Window({
     >
       {/* Title bar */}
       <div
+        className="window-titlebar"
         onMouseDown={handleTitleMouseDown}
-        onDoubleClick={onMaximize}
+        onDoubleClick={() => onMaximize(id)}
         style={{
           height: '38px',
           minHeight: '38px',
@@ -108,18 +118,21 @@ export default function Window({
         {/* Window title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>
           <span style={{ fontSize: '15px' }}>{icon}</span>
-          <span>{title}</span>
+          <span id={titleId}>{title}</span>
         </div>
 
         {/* Window controls */}
-        <div style={{ display: 'flex', gap: '6px' }}>
+        <div className="window-controls" style={{ display: 'flex', gap: '2px' }}>
           <button
+            type="button"
+            className="window-control"
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); onMinimize(id); }}
+            aria-label={`${title} penceresini küçült`}
             title="Küçült"
             style={{
-              width: '13px', height: '13px', borderRadius: '50%',
-              background: '#FBBF24', border: 'none', cursor: 'pointer',
+              width: '30px', height: '30px', borderRadius: '8px',
+              background: 'transparent', border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '9px', color: 'rgba(0,0,0,0)',
               transition: 'color 0.1s',
@@ -127,15 +140,21 @@ export default function Window({
             onMouseEnter={e => e.currentTarget.style.color = 'rgba(0,0,0,0.7)'}
             onMouseLeave={e => e.currentTarget.style.color = 'transparent'}
           >
-            ─
+            <span aria-hidden="true" style={{
+              width: '14px', height: '14px', borderRadius: '50%', background: '#FBBF24',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>─</span>
           </button>
           <button
+            type="button"
+            className="window-control"
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); onMaximize(id); }}
+            aria-label={`${title} penceresini ${isMaximized ? 'geri yükle' : 'büyüt'}`}
             title="Büyüt"
             style={{
-              width: '13px', height: '13px', borderRadius: '50%',
-              background: '#34D399', border: 'none', cursor: 'pointer',
+              width: '30px', height: '30px', borderRadius: '8px',
+              background: 'transparent', border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '9px', color: 'rgba(0,0,0,0)',
               transition: 'color 0.1s',
@@ -143,15 +162,21 @@ export default function Window({
             onMouseEnter={e => e.currentTarget.style.color = 'rgba(0,0,0,0.7)'}
             onMouseLeave={e => e.currentTarget.style.color = 'transparent'}
           >
-            ⊞
+            <span aria-hidden="true" style={{
+              width: '14px', height: '14px', borderRadius: '50%', background: '#34D399',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>⊞</span>
           </button>
           <button
+            type="button"
+            className="window-control"
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); onClose(id); }}
+            aria-label={`${title} penceresini kapat`}
             title="Kapat"
             style={{
-              width: '13px', height: '13px', borderRadius: '50%',
-              background: '#F87171', border: 'none', cursor: 'pointer',
+              width: '30px', height: '30px', borderRadius: '8px',
+              background: 'transparent', border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '9px', color: 'rgba(0,0,0,0)',
               transition: 'color 0.1s',
@@ -159,7 +184,10 @@ export default function Window({
             onMouseEnter={e => e.currentTarget.style.color = 'rgba(0,0,0,0.7)'}
             onMouseLeave={e => e.currentTarget.style.color = 'transparent'}
           >
-            ✕
+            <span aria-hidden="true" style={{
+              width: '14px', height: '14px', borderRadius: '50%', background: '#F87171',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>✕</span>
           </button>
         </div>
       </div>

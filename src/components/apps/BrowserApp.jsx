@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { ArrowLeft, ArrowRight, RefreshCw, Home, X, Plus, Globe, Star, Shield, Lock, ExternalLink, AlertTriangle } from 'lucide-react';
 
@@ -213,7 +213,9 @@ export default function BrowserApp({ initialUrl = HOME_URL }) {
       setHistory(h => { const n = [...h.slice(0, historyIndex + 1), full]; setHistoryIndex(n.length - 1); return n; });
       try {
         setTabs(t => t.map(tab => tab.id === activeTab ? { ...tab, url: full, title: new URL(full).hostname } : tab));
-      } catch {}
+      } catch {
+        // Keep the current tab title when the address cannot be parsed.
+      }
       setLoading(false);
       return;
     }
@@ -222,7 +224,11 @@ export default function BrowserApp({ initialUrl = HOME_URL }) {
     setUrl(full);
     setInputUrl(full);
     setHistory(h => { const n = [...h.slice(0, historyIndex + 1), full]; setHistoryIndex(n.length - 1); return n; });
-    try { setTabs(t => t.map(tab => tab.id === activeTab ? { ...tab, url: full, title: new URL(full).hostname } : tab)); } catch {}
+    try {
+      setTabs(t => t.map(tab => tab.id === activeTab ? { ...tab, url: full, title: new URL(full).hostname } : tab));
+    } catch {
+      // Keep the current tab title when the address cannot be parsed.
+    }
     setTimeout(() => setLoading(false), 2000);
   }, [historyIndex, activeTab]);
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const SKILLS = [
   { label: 'Frontend', abbr: 'FRO', value: 85, color: '#00F5FF' },

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Window from './Window';
 import Taskbar from './Taskbar';
-import { useTheme, WALLPAPERS } from '../contexts/ThemeContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { useSounds } from '../hooks/useSounds';
 import AboutApp from './apps/AboutApp';
 import ProjectsApp from './apps/ProjectsApp';
@@ -11,19 +11,15 @@ import TerminalApp from './apps/TerminalApp';
 import SettingsApp from './apps/SettingsApp';
 import BrowserApp from './apps/BrowserApp';
 
-// ─── Random system notifications ─────────────────────────────────────────────
-const NOTIFICATIONS = [
-  '🔔 Yeni commit algılandı: "feat: UI güncellendi"',
-  '☕ Sistem uyarısı: Kahve molası gerekebilir.',
-  '⚡ DeveloperOS güncellemesi hazır: v1.1',
-  '🌙 İyi akşamlar! Kod yazmaya devam…',
-  '🐙 GitHub: 3 yeni pull request bekleniyor.',
-  '📦 node_modules güncellendi: 247 paket',
-  '🎮 Unity projesi derleniyor... 94%',
-  '🔐 Güvenlik taraması tamamlandı. Tehdit yok.',
-  '⭐ Biri repo\'nuzu yıldızladı!',
-  '🤖 AI sistemi güncellendi.',
-];
+const APP_COMPONENTS = {
+  about: <AboutApp />,
+  projects: <ProjectsApp />,
+  cv: <CVApp />,
+  contact: <ContactApp />,
+  terminal: <TerminalApp />,
+  browser: <BrowserApp />,
+  settings: <SettingsApp />,
+};
 
 // ─── Wallpaper patterns ───────────────────────────────────────────────────────
 function WallpaperLayer({ wallpaper, theme }) {
@@ -92,11 +88,16 @@ function WallpaperLayer({ wallpaper, theme }) {
 function DesktopIcon({ app, onClick, theme }) {
   const [hovered, setHovered] = useState(false);
   return (
-    <div
-      onDoubleClick={() => onClick(app)}
+    <button
+      type="button"
+      className="desktop-icon"
+      onClick={() => onClick(app)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      title={`${app.title} — çift tıkla`}
+      onFocus={() => setHovered(true)}
+      onBlur={() => setHovered(false)}
+      aria-label={`${app.title} uygulamasını aç`}
+      title={`${app.title} uygulamasını aç`}
       style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
         padding: '10px 8px', borderRadius: '10px', cursor: 'pointer',
@@ -104,6 +105,7 @@ function DesktopIcon({ app, onClick, theme }) {
         border: hovered ? `1px solid ${theme.primary}33` : '1px solid transparent',
         width: '80px', transition: 'all 0.15s', userSelect: 'none',
         transform: hovered ? 'translateY(-2px)' : 'translateY(0)',
+        font: 'inherit',
       }}
     >
       <span style={{
@@ -119,7 +121,7 @@ function DesktopIcon({ app, onClick, theme }) {
       }}>
         {app.title}
       </span>
-    </div>
+    </button>
   );
 }
 
@@ -169,63 +171,6 @@ function ContextMenu({ x, y, onClose, onOpenApp, APP_LIST, theme }) {
   );
 }
 
-// ─── Notification toast ───────────────────────────────────────────────────────
-function NotificationToast({ message, onDismiss, theme }) {
-  useEffect(() => {
-    const t = setTimeout(onDismiss, 4500);
-    return () => clearTimeout(t);
-  }, [onDismiss]);
-
-  return (
-    <div
-      onClick={onDismiss}
-      style={{
-        position: 'fixed', bottom: '64px', right: '16px', zIndex: 995,
-        background: 'rgba(8, 8, 18, 0.97)', backdropFilter: 'blur(20px)',
-        border: `1px solid ${theme.primary}33`, borderRadius: '12px',
-        padding: '12px 16px', maxWidth: '300px',
-        boxShadow: `0 8px 30px rgba(0,0,0,0.6), 0 0 0 1px ${theme.primary}11`,
-        cursor: 'pointer', animation: 'slideInRight 0.3s ease',
-      }}
-    >
-      <div style={{ color: theme.primary, fontSize: '10px', fontFamily: 'monospace', marginBottom: '4px', opacity: 0.7 }}>
-        SİSTEM BİLDİRİMİ
-      </div>
-      <div style={{ color: '#e2e8f0', fontSize: '13px' }}>{message}</div>
-    </div>
-  );
-}
-
-// ─── Developer mode overlay ───────────────────────────────────────────────────
-function DevModeOverlay({ onDismiss, theme }) {
-  return (
-    <div
-      onClick={onDismiss}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 997,
-        background: 'rgba(0,0,0,0.75)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer',
-      }}
-    >
-      <div style={{ textAlign: 'center', animation: 'pulse 2s infinite', padding: '40px' }}>
-        <div style={{ fontSize: '52px', marginBottom: '16px', filter: `drop-shadow(0 0 20px ${theme.primary})` }}>⚠️</div>
-        <div style={{
-          fontSize: '24px', fontWeight: 'bold', fontFamily: 'monospace',
-          color: theme.primary, textShadow: `0 0 30px ${theme.primary}`,
-          marginBottom: '8px',
-        }}>
-          GELİŞTİRİCİ MODU ALGILANDI
-        </div>
-        <div style={{ color: '#94a3b8', fontSize: '14px', fontFamily: 'monospace' }}>
-          Sistem analiz ediliyor... Kullanıcı: geliştirici@pro
-        </div>
-        <div style={{ color: '#475569', fontSize: '12px', marginTop: '20px' }}>Kapatmak için tıkla</div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Main Desktop ─────────────────────────────────────────────────────────────
 export default function Desktop() {
   const { theme, wallpaper } = useTheme();
@@ -235,32 +180,18 @@ export default function Desktop() {
   const [windows, setWindows] = useState([]);
   const [topZ, setTopZ] = useState(100);
   const [contextMenu, setContextMenu] = useState(null);
-  const [notification, setNotification] = useState(null);
-  const [devMode, setDevMode] = useState(false);
-  const idleTimerRef = useRef(null);
-  const notifTimerRef = useRef(null);
   const startupPlayedRef = useRef(false);
 
   // ── App configs (inside component to use play callback) ───────────────────
   const APP_LIST = [
     { id: 'about',    title: 'Hakkımda.exe', icon: '👤', subtitle: 'Geliştirici profili & FIFA kartı', size: { w: 840, h: 580 }, defaultPos: () => ({ x: 80,  y: 60  }) },
-    { id: 'projects', title: 'Projeler/',     icon: '📁', subtitle: '10 GitHub repo',                  size: { w: 780, h: 540 }, defaultPos: () => ({ x: 160, y: 80  }) },
+    { id: 'projects', title: 'Projeler/',     icon: '📁', subtitle: '10 seçili proje',                 size: { w: 780, h: 540 }, defaultPos: () => ({ x: 160, y: 80  }) },
     { id: 'cv',       title: 'CV.exe',        icon: '📄', subtitle: 'Özgeçmiş görüntüleyici',          size: { w: 760, h: 580 }, defaultPos: () => ({ x: 220, y: 60  }) },
     { id: 'contact',  title: 'İletişim.app',  icon: '✉️', subtitle: 'Email client',                    size: { w: 780, h: 520 }, defaultPos: () => ({ x: 260, y: 80  }) },
     { id: 'terminal', title: 'Terminal',      icon: '⬛', subtitle: 'AffanOS Shell',                   size: { w: 680, h: 440 }, defaultPos: () => ({ x: 300, y: 100 }) },
     { id: 'browser',  title: 'Tarayıcı',      icon: '🌐', subtitle: 'AffanOS Browser',                 size: { w: 900, h: 620 }, defaultPos: () => ({ x: 180, y: 50  }) },
     { id: 'settings', title: 'Ayarlar',       icon: '⚙️', subtitle: 'Kişiselleştirme',                 size: { w: 560, h: 600 }, defaultPos: () => ({ x: 400, y: 80  }) },
   ];
-
-  const APP_COMPONENTS = {
-    about:    <AboutApp />,
-    projects: <ProjectsApp />,
-    cv:       <CVApp />,
-    contact:  <ContactApp />,
-    terminal: <TerminalApp />,
-    browser:  <BrowserApp />,
-    settings: <SettingsApp />,
-  };
 
   // Startup sound on first user interaction
   useEffect(() => {
@@ -273,38 +204,6 @@ export default function Desktop() {
     };
     document.addEventListener('click', handleFirst);
     return () => document.removeEventListener('click', handleFirst);
-  }, [play]);
-
-  // ── Idle timer (10 sec) ────────────────────────────────────────────────────
-  const resetIdle = useCallback(() => {
-    clearTimeout(idleTimerRef.current);
-    idleTimerRef.current = setTimeout(() => setDevMode(true), 10000);
-  }, []);
-
-  useEffect(() => {
-    resetIdle();
-    window.addEventListener('mousemove', resetIdle);
-    window.addEventListener('keydown', resetIdle);
-    return () => {
-      window.removeEventListener('mousemove', resetIdle);
-      window.removeEventListener('keydown', resetIdle);
-      clearTimeout(idleTimerRef.current);
-    };
-  }, [resetIdle]);
-
-  // ── Random notifications ───────────────────────────────────────────────────
-  useEffect(() => {
-    const schedule = () => {
-      const delay = 35000 + Math.random() * 50000;
-      notifTimerRef.current = setTimeout(() => {
-        const msg = NOTIFICATIONS[Math.floor(Math.random() * NOTIFICATIONS.length)];
-        setNotification(msg);
-        play('notification');
-        schedule();
-      }, delay);
-    };
-    schedule();
-    return () => clearTimeout(notifTimerRef.current);
   }, [play]);
 
   // ── Window management ──────────────────────────────────────────────────────
@@ -324,6 +223,8 @@ export default function Desktop() {
       setTopZ(newZ);
       const pos = appConfig.defaultPos();
       const offset = prev.length * 24;
+      const safeX = Math.max(12, Math.min(pos.x + offset, window.innerWidth - appConfig.size.w - 12));
+      const safeY = Math.max(12, Math.min(pos.y + offset, window.innerHeight - appConfig.size.h - 60));
       play('windowOpen');
       return [...prev, {
         id: Date.now(),
@@ -332,7 +233,7 @@ export default function Desktop() {
         icon: appConfig.icon,
         isMinimized: false,
         isMaximized: false,
-        position: { x: Math.min(pos.x + offset, window.innerWidth - 300), y: Math.min(pos.y + offset, window.innerHeight - 200) },
+        position: { x: safeX, y: safeY },
         size: appConfig.size,
         zIndex: newZ,
         component: APP_COMPONENTS[appConfig.id],
@@ -385,7 +286,9 @@ export default function Desktop() {
   };
 
   return (
-    <div
+    <main
+      className="portfolio-desktop"
+      aria-label="Affan Emirhan Çüçen portföy masaüstü"
       onContextMenu={handleContextMenu}
       onClick={() => setContextMenu(null)}
       style={{
@@ -408,14 +311,33 @@ export default function Desktop() {
       </div>
 
       {/* Desktop icons */}
-      <div style={{
+      <nav className="desktop-icon-dock" aria-label="Portföy uygulamaları" style={{
         position: 'absolute', top: '20px', left: '20px',
         display: 'flex', flexDirection: 'column', gap: '4px',
       }}>
         {APP_LIST.map(app => (
           <DesktopIcon key={app.id} app={app} onClick={openApp} theme={theme} />
         ))}
-      </div>
+      </nav>
+
+      <section className="desktop-intro" aria-labelledby="portfolio-title">
+        <div className="desktop-intro__eyebrow" style={{ color: theme.primary }}>
+          PORTFOLYO · 2026
+        </div>
+        <h1 id="portfolio-title">Affan Emirhan Çüçen</h1>
+        <p>Full-Stack web geliştirme, Unity oyun programlama ve yapay zekâ entegrasyonları.</p>
+        <div className="desktop-intro__actions">
+          {['about', 'projects', 'contact'].map(appId => {
+            const app = APP_LIST.find(item => item.id === appId);
+            return (
+              <button key={appId} type="button" onClick={() => openApp(app)}>
+                <span aria-hidden="true">{app.icon}</span>
+                {appId === 'about' ? 'Hakkımda' : appId === 'projects' ? 'Projeler' : 'İletişim'}
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
       {/* Windows */}
       {windows.map(win => (
@@ -444,7 +366,6 @@ export default function Desktop() {
         windows={windows}
         apps={APP_LIST}
         onOpenApp={openApp}
-        onFocusWindow={focusWindow}
         onToggleMinimize={toggleMinimize}
         muted={muted}
         onToggleMute={() => { setMuted(m => !m); }}
@@ -461,17 +382,6 @@ export default function Desktop() {
         />
       )}
 
-      {/* Notification */}
-      {notification && (
-        <NotificationToast
-          message={notification}
-          onDismiss={() => setNotification(null)}
-          theme={theme}
-        />
-      )}
-
-      {/* Dev mode easter egg */}
-      {devMode && <DevModeOverlay onDismiss={() => { setDevMode(false); resetIdle(); play('error'); }} theme={theme} />}
-    </div>
+    </main>
   );
 }

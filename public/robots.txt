@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://affan-portfolio-gilt.vercel.app/sitemap.xml

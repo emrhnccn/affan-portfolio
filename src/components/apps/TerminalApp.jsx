@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { TerminalSquare } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 
 const simulateAIResponse = async (query) => {
   await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 1000));
