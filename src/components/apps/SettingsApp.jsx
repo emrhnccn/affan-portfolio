@@ -227,10 +227,10 @@ export default function SettingsApp() {
           }}>
             {[
               ['İşletim Sistemi', 'AffanOS v1.0'],
-              ['Kernel', 'React 18.3.1'],
+              ['Kernel', 'React 19.2.5'],
               ['Geliştirici', 'Affan Emirhan Çüçen'],
-              ['Build Tarihi', '2024'],
-              ['Tema Motoru', 'CSS-in-JS'],
+              ['Build Yılı', '2026'],
+              ['Stil & Tema', 'Modern Design Tokens & Tailwind 4'],
               ['Ses Sistemi', 'Web Audio API'],
             ].map(([k, v]) => (
               <div key={k} style={{ padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>

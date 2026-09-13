@@ -72,8 +72,12 @@ export function useSounds(muted) {
   const ctxRef = useRef(null);
 
   const ensureCtx = useCallback(() => {
-    if (!ctxRef.current) ctxRef.current = createCtx();
-    if (ctxRef.current?.state === 'suspended') ctxRef.current.resume();
+    if (!ctxRef.current || ctxRef.current.state === 'closed') {
+      ctxRef.current = createCtx();
+    }
+    if (ctxRef.current?.state === 'suspended') {
+      ctxRef.current.resume().catch(() => {});
+    }
     return ctxRef.current;
   }, []);
 

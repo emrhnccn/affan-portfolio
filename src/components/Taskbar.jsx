@@ -11,32 +11,15 @@ function useClock() {
   return time;
 }
 
-function useSystemStats() {
-  const [cpu, setCpu] = useState(12);
-  const [ram, setRam] = useState(4.2);
-  useEffect(() => {
-    const t = setInterval(() => {
-      setCpu(prev => Math.max(5, Math.min(85, prev + (Math.random() - 0.5) * 12)));
-      setRam(prev => Math.max(2.8, Math.min(7.2, prev + (Math.random() - 0.5) * 0.3)));
-    }, 2000);
-    return () => clearInterval(t);
-  }, []);
-  return { cpu: Math.round(cpu), ram: ram.toFixed(1) };
-}
-
 export default function Taskbar({ windows, apps, onOpenApp, onToggleMinimize, muted, onToggleMute }) {
   const [startOpen, setStartOpen] = useState(false);
   const startButtonRef = useRef(null);
   const wasStartOpenRef = useRef(false);
   const time = useClock();
-  const { cpu, ram } = useSystemStats();
   const { theme } = useTheme();
 
   const formatTime = (d) => d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
   const formatDate = (d) => d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' });
-
-  const cpuColor = cpu > 70 ? '#f87171' : cpu > 40 ? '#facc15' : theme.primary;
-  const openWindows = windows;
 
   useEffect(() => {
     if (wasStartOpenRef.current && !startOpen) {
@@ -55,19 +38,20 @@ export default function Taskbar({ windows, apps, onOpenApp, onToggleMinimize, mu
         />
       )}
 
-      <div
+      <footer
         className="taskbar"
         role="navigation"
         aria-label="AffanOS görev çubuğu"
         style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
           height: '48px', zIndex: 990,
-          background: theme.taskbarBg,
+          background: theme.taskbarBg || 'rgba(6, 6, 14, 0.95)',
           backdropFilter: 'blur(20px)',
-          borderTop: `1px solid ${theme.primary}18`,
+          WebkitBackdropFilter: 'blur(20px)',
+          borderTop: `1px solid ${theme.primary}20`,
           display: 'flex', alignItems: 'center',
-          padding: '0 12px', gap: '6px',
-          boxShadow: '0 -2px 20px rgba(0,0,0,0.5)',
+          padding: '0 12px', gap: '8px',
+          boxShadow: '0 -4px 25px rgba(0,0,0,0.6)',
         }}
       >
         {/* Start button */}
@@ -82,7 +66,7 @@ export default function Taskbar({ windows, apps, onOpenApp, onToggleMinimize, mu
           style={{
             width: '38px', height: '34px', borderRadius: '8px',
             background: startOpen ? `${theme.primary}33` : 'rgba(255,255,255,0.06)',
-            border: startOpen ? `1px solid ${theme.primary}55` : '1px solid rgba(255,255,255,0.08)',
+            border: startOpen ? `1px solid ${theme.primary}60` : '1px solid rgba(255,255,255,0.08)',
             cursor: 'pointer', fontSize: '18px',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'all 0.15s', flexShrink: 0,
@@ -96,10 +80,9 @@ export default function Taskbar({ windows, apps, onOpenApp, onToggleMinimize, mu
         {/* Divider */}
         <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
 
-        {/* Open windows */}
+        {/* Open windows list */}
         <div className="taskbar-windows" style={{ flex: 1, display: 'flex', gap: '4px', overflow: 'hidden' }}>
-          {/* Taskbar window buttons */}
-          {openWindows.map(win => (
+          {windows.map(win => (
             <button
               type="button"
               key={win.id}
@@ -108,101 +91,99 @@ export default function Taskbar({ windows, apps, onOpenApp, onToggleMinimize, mu
               title={win.title}
               style={{
                 display: 'flex', alignItems: 'center', gap: '6px',
-                padding: '0 10px', height: '34px', borderRadius: '8px',
+                padding: '0 12px', height: '34px', borderRadius: '8px',
                 background: win.isMinimized
                   ? 'rgba(255,255,255,0.04)'
                   : `${theme.primary}18`,
                 border: win.isMinimized
                   ? '1px solid rgba(255,255,255,0.06)'
-                  : `1px solid ${theme.primary}40`,
-                color: win.isMinimized ? '#64748b' : '#e2e8f0',
+                  : `1px solid ${theme.primary}45`,
+                color: win.isMinimized ? '#64748b' : '#f8fafc',
                 fontSize: '12px', cursor: 'pointer',
-                maxWidth: '160px', overflow: 'hidden',
+                maxWidth: '170px', overflow: 'hidden',
                 whiteSpace: 'nowrap', textOverflow: 'ellipsis',
                 transition: 'all 0.15s', flexShrink: 0,
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = `${theme.primary}22`; }}
+              onMouseEnter={e => { e.currentTarget.style.background = `${theme.primary}25`; }}
               onMouseLeave={e => {
                 e.currentTarget.style.background = win.isMinimized ? 'rgba(255,255,255,0.04)' : `${theme.primary}18`;
               }}
             >
-              <span style={{ fontSize: '14px' }}>{win.icon}</span>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{win.title}</span>
+              <span style={{ fontSize: '14px' }} aria-hidden="true">{win.icon}</span>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 500 }}>{win.title}</span>
               {!win.isMinimized && (
                 <div style={{
-                  width: '4px', height: '4px', borderRadius: '50%',
+                  width: '5px', height: '5px', borderRadius: '50%',
                   background: theme.primary, flexShrink: 0,
-                  boxShadow: `0 0 4px ${theme.primary}cc`,
+                  boxShadow: `0 0 6px ${theme.primary}`,
                 }} />
               )}
             </button>
           ))}
         </div>
 
-        {/* System indicators */}
+        {/* Authentic System Status Indicators (Replacing Fake Random Math) */}
         <div className="taskbar-system" style={{
-          display: 'flex', alignItems: 'center', gap: '12px',
+          display: 'flex', alignItems: 'center', gap: '10px',
           flexShrink: 0, paddingLeft: '8px',
-          borderLeft: '1px solid rgba(255,255,255,0.06)',
+          borderLeft: '1px solid rgba(255,255,255,0.08)',
         }}>
-          {/* CPU */}
-          <div className="taskbar-stat" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-            <div style={{ display: 'flex', gap: '3px', alignItems: 'center' }}>
-              <span style={{ color: '#475569', fontSize: '9px', letterSpacing: '0.05em' }}>CPU</span>
-              <span style={{ color: cpuColor, fontSize: '10px', fontFamily: 'monospace', fontWeight: 700 }}>
-                {cpu}%
-              </span>
-            </div>
-            <div style={{ width: '48px', height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
-              <div style={{
-                height: '100%', width: `${cpu}%`,
-                background: cpuColor, borderRadius: '2px',
-                transition: 'width 1.5s ease, background 0.5s',
-                boxShadow: `0 0 4px ${cpuColor}88`,
-              }} />
-            </div>
+          {/* Status: Available for Work */}
+          <div className="taskbar-stat" style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            padding: '4px 8px', borderRadius: '6px',
+            background: 'rgba(52, 211, 153, 0.08)',
+            border: '1px solid rgba(52, 211, 153, 0.25)',
+          }} title="İş tekliflerine ve yeni projelere açık">
+            <span style={{
+              width: '6px', height: '6px', borderRadius: '50%',
+              background: '#34d399', boxShadow: '0 0 6px #34d399'
+            }} />
+            <span style={{ color: '#34d399', fontSize: '10px', fontFamily: 'monospace', fontWeight: 700 }}>
+              AKTİF · İŞE AÇIK
+            </span>
           </div>
 
-          {/* RAM */}
-          <div className="taskbar-stat" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-            <div style={{ display: 'flex', gap: '3px', alignItems: 'center' }}>
-              <span style={{ color: '#475569', fontSize: '9px', letterSpacing: '0.05em' }}>RAM</span>
-              <span style={{ color: theme.primary, fontSize: '10px', fontFamily: 'monospace', fontWeight: 700 }}>
-                {ram}GB
-              </span>
-            </div>
-            <div style={{ width: '48px', height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
-              <div style={{
-                height: '100%', width: `${(ram / 8) * 100}%`,
-                background: theme.primary, borderRadius: '2px',
-                transition: 'width 1.5s ease',
-                boxShadow: `0 0 4px ${theme.primary}88`,
-              }} />
-            </div>
+          {/* Stack Indicator */}
+          <div className="taskbar-stat" style={{
+            display: 'flex', alignItems: 'center', gap: '4px',
+            padding: '4px 8px', borderRadius: '6px',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.06)',
+          }} title="Teknoloji Mimarisi">
+            <span style={{ color: '#64748b', fontSize: '9px', fontFamily: 'monospace' }}>STACK</span>
+            <span style={{ color: theme.primary, fontSize: '10px', fontFamily: 'monospace', fontWeight: 700 }}>
+              REACT 19
+            </span>
           </div>
 
-          {/* Projects */}
-          <div className="taskbar-stat" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-            <span style={{ color: '#475569', fontSize: '9px', letterSpacing: '0.05em' }}>PROJE</span>
-            <span style={{ color: theme.secondary, fontSize: '12px', fontFamily: 'monospace', fontWeight: 700 }}>10</span>
+          {/* Projects Count */}
+          <div className="taskbar-stat" style={{
+            display: 'flex', alignItems: 'center', gap: '4px',
+            padding: '4px 8px', borderRadius: '6px',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.06)',
+          }} title="Toplam Proje Sayısı">
+            <span style={{ color: '#64748b', fontSize: '9px', fontFamily: 'monospace' }}>PROJE</span>
+            <span style={{ color: theme.secondary || '#ff00c8', fontSize: '10px', fontFamily: 'monospace', fontWeight: 700 }}>
+              10
+            </span>
           </div>
 
-          {/* Mute button */}
+          {/* Mute toggle button */}
           <button
             type="button"
             onClick={onToggleMute}
             aria-label={muted ? 'Sesi aç' : 'Sesi kapat'}
             title={muted ? 'Sesi Aç' : 'Sesi Kapat'}
             style={{
-              width: '28px', height: '28px', borderRadius: '6px',
+              width: '30px', height: '30px', borderRadius: '6px',
               background: muted ? 'rgba(248,113,113,0.15)' : 'rgba(255,255,255,0.05)',
-              border: muted ? '1px solid rgba(248,113,113,0.3)' : '1px solid rgba(255,255,255,0.08)',
+              border: muted ? '1px solid rgba(248,113,113,0.35)' : '1px solid rgba(255,255,255,0.08)',
               cursor: 'pointer', fontSize: '14px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'all 0.2s',
             }}
-            onMouseEnter={e => e.currentTarget.style.background = muted ? 'rgba(248,113,113,0.25)' : 'rgba(255,255,255,0.1)'}
-            onMouseLeave={e => e.currentTarget.style.background = muted ? 'rgba(248,113,113,0.15)' : 'rgba(255,255,255,0.05)'}
           >
             {muted ? '🔇' : '🔊'}
           </button>
@@ -212,21 +193,21 @@ export default function Taskbar({ windows, apps, onOpenApp, onToggleMinimize, mu
             className="taskbar-clock"
             style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center',
-              padding: '4px 10px', borderRadius: '6px',
+              padding: '3px 8px', borderRadius: '6px',
               background: 'rgba(255,255,255,0.04)',
               border: '1px solid rgba(255,255,255,0.06)',
               cursor: 'default',
             }}
           >
-            <span style={{ color: '#e2e8f0', fontSize: '12px', fontFamily: 'monospace', fontWeight: 600, lineHeight: 1.2 }}>
+            <span style={{ color: '#f8fafc', fontSize: '11.5px', fontFamily: 'monospace', fontWeight: 600, lineHeight: 1.2 }}>
               {formatTime(time)}
             </span>
-            <span style={{ color: '#64748b', fontSize: '10px', fontFamily: 'monospace' }}>
+            <span style={{ color: '#94a3b8', fontSize: '9.5px', fontFamily: 'monospace' }}>
               {formatDate(time)}
             </span>
           </div>
         </div>
-      </div>
+      </footer>
     </>
   );
 }

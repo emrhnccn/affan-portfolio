@@ -51,16 +51,19 @@ export default function TerminalApp() {
 
     switch (cmd) {
       case 'yardim': case 'help':
-        newHistory.push({ type: 'output', text: 'Komutlar: kimimben, projeler, yetenekler, egitim, iletisim, temizle, ai [soru]' });
+        newHistory.push({ type: 'output', text: 'Komutlar: kimimben, projeler, yetenekler, egitim, cv, iletisim, ls, whoami, uname -a, temizle, ai [soru]' });
         break;
       case 'kimimben':
-        newHistory.push({ type: 'output', text: 'Affan Emirhan Çüçen — Full-Stack web, Unity oyun ve teknik SEO uzmanı yazılım geliştirici.' });
+        newHistory.push({ type: 'output', text: 'Affan Emirhan Çüçen — Bilgisayar Mühendisi, Full-Stack web ve Unity oyun geliştirici.' });
         break;
       case 'projeler':
-        newHistory.push({ type: 'output', text: '1. Gerçek Zamanlı Mesajlaşma\n2. Restoran Rezervasyon Sistemi\n3. KYK Yurt Otomasyonu\n4. 3D Co-op Bulmaca Oyunu\n5. Kampüs Temalı Match-3\n6. AI & Veri Otomasyonları\n+ 4 daha...\n\nDetaylar için Projeler uygulamasını açın.' });
+        newHistory.push({ type: 'output', text: 'Öne Çıkanlar:\n1. Gerçek Zamanlı Mesajlaşma (Node.js + Socket.io + MongoDB)\n2. GustoPos (TypeScript + React POS Sistemi)\n3. 3D Co-op Bulmaca Oyunu (Unity 3D + C#)\n+ 7 seçili proje daha... (Detaylar için Projeler uygulamasını açın)' });
         break;
       case 'yetenekler':
-        newHistory.push({ type: 'output', text: 'Frontend : React.js, Tailwind CSS, JS (ES6+)\nBackend  : Node.js, Express.js, Socket.io\nVT       : MongoDB, MySQL\nOyun     : Unity 3D/2D, C#, Blender\nDiğer    : LLM API, Web Scraping, Teknik SEO' });
+        newHistory.push({ type: 'output', text: 'Frontend : React 19, TypeScript, JavaScript (ES6+), Tailwind CSS\nBackend  : Node.js, Express.js, Socket.io (WebSocket)\nVeritabanı: MySQL (RDBMS, 3NF), MongoDB\nOyun     : Unity 3D/2D, C#, Rigidbody Fizik, Blender\nDiğer    : LLM API, Web Scraping, Teknik SEO' });
+        break;
+      case 'cv':
+        newHistory.push({ type: 'output', text: '📄 CV indirilebilir durumda: /affanCV11.pdf\nDoğrudan görüntülemek için masaüstündeki CV.exe uygulamasını açabilirsiniz.' });
         break;
       case 'egitim':
         newHistory.push({ type: 'output', text: '🎓 Bartın Üniversitesi — Bilgisayar Mühendisliği (2022 - Devam)\n🎓 Fırat Üniversitesi — Bilgisayar Mühendisliği (2018 - 2022)' });
@@ -79,10 +82,10 @@ export default function TerminalApp() {
         newHistory.push({ type: 'output', text: 'Hakkımda.exe   Projeler/   CV.exe   İletişim.app   README.md' });
         break;
       case 'cat readme.md':
-        newHistory.push({ type: 'output', text: '# Affan Emirhan Çüçen\nFull-Stack Developer | Unity | AI Enthusiast\nBartın Üniversitesi, Bilgisayar Mühendisliği\nBu portföy DeveloperOS v1.0 üzerinde çalışmaktadır.' });
+        newHistory.push({ type: 'output', text: '# Affan Emirhan Çüçen\nBilgisayar Mühendisi & Full-Stack Developer\nBartın Üniversitesi, Bilgisayar Mühendisliği\nBu portföy AffanOS v1.0 üzerinde çalışmaktadır.' });
         break;
       case 'uname -a':
-        newHistory.push({ type: 'output', text: 'AffanOS 1.0 DeveloperOS-Kernel #1 SMP React18 x86_64 JavaScript/Node.js' });
+        newHistory.push({ type: 'output', text: 'AffanOS 1.0 DeveloperOS-Kernel #1 SMP React19 x86_64 JavaScript/Node.js' });
         break;
       default:
         newHistory.push({ type: 'error', text: `Komut bulunamadı: '${cmd}'. "yardim" yazarak komut listesini görebilirsin.` });

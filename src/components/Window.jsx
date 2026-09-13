@@ -21,11 +21,11 @@ export default function Window({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
   const windowRef = useRef(null);
+  const titleBarRef = useRef(null);
   const { theme, speed } = useTheme();
   const titleId = `window-title-${id}`;
 
   useEffect(() => {
-    // Slight delay for mount animation
     const t = setTimeout(() => {
       setMounted(true);
       windowRef.current?.focus();
@@ -33,41 +33,87 @@ export default function Window({
     return () => clearTimeout(t);
   }, []);
 
-  const handleTitleMouseDown = useCallback((e) => {
-    if (isMaximized || e.button !== 0) return;
-    e.preventDefault();
+  // Handle pointer down on the titlebar
+  const handlePointerDown = useCallback((e) => {
+    if (isMaximized) return;
+    // Only primary pointer button (left click or touch)
+    if (e.button !== undefined && e.button !== 0) return;
+
     onFocus(id);
     setIsDragging(true);
     setDragOffset({
       x: e.clientX - position.x,
       y: e.clientY - position.y,
     });
-  }, [isMaximized, position, id, onFocus]);
 
-  useEffect(() => {
+    try {
+      e.target.setPointerCapture(e.pointerId);
+    } catch {
+      // Fallback if setPointerCapture is unsupported
+    }
+  }, [isMaximized, onFocus, id, position]);
+
+  // Handle pointer move while dragging
+  const handlePointerMove = useCallback((e) => {
     if (!isDragging) return;
-    const handleMouseMove = (e) => {
-      const newX = Math.max(0, Math.min(e.clientX - dragOffset.x, window.innerWidth - 120));
-      const newY = Math.max(0, Math.min(e.clientY - dragOffset.y, window.innerHeight - 80));
-      onMove(id, { x: newX, y: newY });
-    };
-    const handleMouseUp = () => setIsDragging(false);
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
+    e.preventDefault();
+
+    const taskbarHeight = 48;
+    const titleHeight = 38;
+
+    // Strict boundary clamping so the titlebar stays comfortably within the viewport
+    const maxX = Math.max(0, window.innerWidth - 100);
+    const maxY = Math.max(0, window.innerHeight - taskbarHeight - titleHeight);
+
+    const newX = Math.max(0, Math.min(e.clientX - dragOffset.x, maxX));
+    const newY = Math.max(0, Math.min(e.clientY - dragOffset.y, maxY));
+
+    onMove(id, { x: newX, y: newY });
   }, [isDragging, dragOffset, id, onMove]);
 
-  const style = isMaximized
-    ? { left: 0, top: 0, width: '100vw', height: 'calc(100dvh - 48px)', zIndex }
+  // Handle pointer up
+  const handlePointerUp = useCallback((e) => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    try {
+      if (e.target.hasPointerCapture && e.target.hasPointerCapture(e.pointerId)) {
+        e.target.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // Fallback
+    }
+  }, [isDragging]);
+
+  // Keyboard shortcut listener on active window dialog
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      onClose(id);
+    } else if (e.altKey && (e.key === 'm' || e.key === 'M')) {
+      e.preventDefault();
+      onMinimize(id);
+    }
+  }, [id, onClose, onMinimize]);
+
+  // Window geometry styles
+  const windowStyle = isMaximized
+    ? {
+        left: 0,
+        top: 0,
+        width: '100vw',
+        height: 'calc(100dvh - 48px)',
+        zIndex,
+        borderRadius: 0,
+      }
     : {
-        left: position.x,
-        top: position.y,
+        left: Math.max(0, Math.min(position.x, window.innerWidth - 100)),
+        top: Math.max(0, Math.min(position.y, window.innerHeight - 86)),
         width: size.w,
         height: size.h,
+        maxWidth: 'calc(100vw - 16px)',
+        maxHeight: 'calc(100dvh - 64px)',
         zIndex,
+        borderRadius: '12px',
       };
 
   return (
@@ -78,28 +124,33 @@ export default function Window({
       aria-modal="false"
       aria-labelledby={titleId}
       tabIndex={-1}
-      onMouseDown={() => onFocus(id)}
+      onKeyDown={handleKeyDown}
+      onPointerDown={() => onFocus(id)}
       style={{
-        ...style,
+        ...windowStyle,
         position: 'fixed',
         display: isMinimized ? 'none' : 'flex',
         flexDirection: 'column',
-        borderRadius: isMaximized ? 0 : '10px',
         overflow: 'hidden',
-        boxShadow: `0 25px 60px rgba(0,0,0,0.8), 0 0 0 1px ${theme.primary}18`,
+        boxShadow: `0 25px 60px rgba(0,0,0,0.85), 0 0 0 1px ${theme.primary}25`,
         background: theme.windowBg,
-        backdropFilter: 'blur(24px)',
-        transform: mounted ? 'scale(1)' : 'scale(0.92)',
+        backdropFilter: 'blur(28px)',
+        WebkitBackdropFilter: 'blur(28px)',
+        transform: mounted ? 'scale(1)' : 'scale(0.94)',
         opacity: mounted ? 1 : 0,
         transition: isDragging
-          ? 'box-shadow 0.1s'
-          : `transform ${speed?.ms || 180}ms cubic-bezier(0.34,1.56,0.64,1), opacity ${speed?.ms || 180}ms ease`,
+          ? 'none'
+          : `transform ${speed?.ms || 180}ms cubic-bezier(0.16, 1, 0.3, 1), opacity ${speed?.ms || 180}ms ease`,
       }}
     >
-      {/* Title bar */}
+      {/* Title Bar with Pointer Event Listeners */}
       <div
+        ref={titleBarRef}
         className="window-titlebar"
-        onMouseDown={handleTitleMouseDown}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
         onDoubleClick={() => onMaximize(id)}
         style={{
           height: '38px',
@@ -110,90 +161,74 @@ export default function Window({
           padding: '0 12px',
           cursor: isDragging ? 'grabbing' : 'grab',
           background: theme.titleBar,
-          borderBottom: `1px solid ${theme.primary}15`,
+          borderBottom: `1px solid ${theme.primary}18`,
           userSelect: 'none',
+          touchAction: 'none',
           flexShrink: 0,
         }}
       >
-        {/* Window title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>
-          <span style={{ fontSize: '15px' }}>{icon}</span>
+        {/* Title & Icon */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#f1f5f9', fontWeight: 600 }}>
+          <span style={{ fontSize: '15px' }} aria-hidden="true">{icon}</span>
           <span id={titleId}>{title}</span>
         </div>
 
-        {/* Window controls */}
-        <div className="window-controls" style={{ display: 'flex', gap: '2px' }}>
+        {/* Window Controls */}
+        <div className="window-controls" style={{ display: 'flex', gap: '4px' }}>
+          {/* Minimize button */}
           <button
             type="button"
             className="window-control"
-            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); onMinimize(id); }}
             aria-label={`${title} penceresini küçült`}
-            title="Küçült"
-            style={{
-              width: '30px', height: '30px', borderRadius: '8px',
-              background: 'transparent', border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '9px', color: 'rgba(0,0,0,0)',
-              transition: 'color 0.1s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.color = 'rgba(0,0,0,0.7)'}
-            onMouseLeave={e => e.currentTarget.style.color = 'transparent'}
+            title="Küçült (Alt+M)"
           >
             <span aria-hidden="true" style={{
-              width: '14px', height: '14px', borderRadius: '50%', background: '#FBBF24',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: '13px', height: '13px', borderRadius: '50%', background: '#FBBF24',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', color: '#78350f', fontWeight: 800
             }}>─</span>
           </button>
+
+          {/* Maximize / Restore button */}
           <button
             type="button"
             className="window-control"
-            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); onMaximize(id); }}
-            aria-label={`${title} penceresini ${isMaximized ? 'geri yükle' : 'büyüt'}`}
-            title="Büyüt"
-            style={{
-              width: '30px', height: '30px', borderRadius: '8px',
-              background: 'transparent', border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '9px', color: 'rgba(0,0,0,0)',
-              transition: 'color 0.1s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.color = 'rgba(0,0,0,0.7)'}
-            onMouseLeave={e => e.currentTarget.style.color = 'transparent'}
+            aria-label={`${title} penceresini ${isMaximized ? 'geri yükle' : 'tam ekran yap'}`}
+            title={isMaximized ? 'Geri Yükle' : 'Tam Ekran'}
           >
             <span aria-hidden="true" style={{
-              width: '14px', height: '14px', borderRadius: '50%', background: '#34D399',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: '13px', height: '13px', borderRadius: '50%', background: '#34D399',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', color: '#064e3b', fontWeight: 800
             }}>⊞</span>
           </button>
+
+          {/* Close button */}
           <button
             type="button"
             className="window-control"
-            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); onClose(id); }}
             aria-label={`${title} penceresini kapat`}
-            title="Kapat"
-            style={{
-              width: '30px', height: '30px', borderRadius: '8px',
-              background: 'transparent', border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '9px', color: 'rgba(0,0,0,0)',
-              transition: 'color 0.1s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.color = 'rgba(0,0,0,0.7)'}
-            onMouseLeave={e => e.currentTarget.style.color = 'transparent'}
+            title="Kapat (Esc)"
           >
             <span aria-hidden="true" style={{
-              width: '14px', height: '14px', borderRadius: '50%', background: '#F87171',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: '13px', height: '13px', borderRadius: '50%', background: '#F87171',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', color: '#7f1d1d', fontWeight: 800
             }}>✕</span>
           </button>
         </div>
       </div>
 
-      {/* Content area */}
-      <div style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
+      {/* Content Area - Pointer events disabled during drag to prevent iframe swallowing */}
+      <div style={{
+        flex: 1,
+        overflow: 'auto',
+        position: 'relative',
+        pointerEvents: isDragging ? 'none' : 'auto',
+      }}>
         {children}
       </div>
     </div>
