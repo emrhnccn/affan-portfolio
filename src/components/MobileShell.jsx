@@ -94,8 +94,8 @@ export default function MobileShell({ apps, onOpenApp, onMuteToggle, muted }) {
         {/* Quick Links Row */}
         <div className="mobile-shell__quick-links">
           <a
-            href="/affanCV11.pdf"
-            download="Affan_Emirhan_Cucen_CV.pdf"
+            href="/Afvan_Emirhan_Cucen_CV.pdf"
+            download="Afvan_Emirhan_Cucen_CV.pdf"
             className="mobile-shell__quick-link"
             style={{ color: '#00F5FF', borderColor: 'rgba(0,245,255,0.3)' }}
           >

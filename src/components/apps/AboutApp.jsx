@@ -316,7 +316,7 @@ export default function AboutApp() {
               }}>
                 <div style={{ color: '#ffffff', fontSize: '13.5px', fontWeight: 700 }}>Fırat Üniversitesi</div>
                 <div style={{ color: '#94a3b8', fontSize: '12px', fontFamily: 'monospace', marginTop: '2px' }}>
-                  Bilgisayar Mühendisliği · 2018 – 2022
+                  Bilgisayar Mühendisliği · 2019 – 2022
                 </div>
               </div>
             </div>

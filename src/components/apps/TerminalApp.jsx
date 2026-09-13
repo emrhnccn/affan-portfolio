@@ -63,10 +63,10 @@ export default function TerminalApp() {
         newHistory.push({ type: 'output', text: 'Frontend : React 19, TypeScript, JavaScript (ES6+), Tailwind CSS\nBackend  : Node.js, Express.js, Socket.io (WebSocket)\nVeritabanı: MySQL (RDBMS, 3NF), MongoDB\nOyun     : Unity 3D/2D, C#, Rigidbody Fizik, Blender\nDiğer    : LLM API, Web Scraping, Teknik SEO' });
         break;
       case 'cv':
-        newHistory.push({ type: 'output', text: '📄 CV indirilebilir durumda: /affanCV11.pdf\nDoğrudan görüntülemek için masaüstündeki CV.exe uygulamasını açabilirsiniz.' });
+        newHistory.push({ type: 'output', text: '📄 CV indirilebilir durumda: /Afvan_Emirhan_Cucen_CV.pdf\nDoğrudan görüntülemek için masaüstündeki CV.exe uygulamasını açabilirsiniz.' });
         break;
       case 'egitim':
-        newHistory.push({ type: 'output', text: '🎓 Bartın Üniversitesi — Bilgisayar Mühendisliği (2022 - Devam)\n🎓 Fırat Üniversitesi — Bilgisayar Mühendisliği (2018 - 2022)' });
+        newHistory.push({ type: 'output', text: '🎓 Bartın Üniversitesi — Bilgisayar Mühendisliği (2022 - Devam)\n🎓 Fırat Üniversitesi — Bilgisayar Mühendisliği (2019 - 2022)' });
         break;
       case 'iletisim':
         newHistory.push({ type: 'output', text: 'E-posta  : emrhn.ccn@gmail.com\nLinkedIn : /in/affanccn\nGitHub   : /emrhnccn' });
