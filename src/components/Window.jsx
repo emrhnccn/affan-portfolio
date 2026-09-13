@@ -22,7 +22,7 @@ export default function Window({
   const [mounted, setMounted] = useState(false);
   const windowRef = useRef(null);
   const titleBarRef = useRef(null);
-  const { theme, speed } = useTheme();
+  const { theme, speed, glass } = useTheme();
   const titleId = `window-title-${id}`;
 
   useEffect(() => {
@@ -134,8 +134,8 @@ export default function Window({
         overflow: 'hidden',
         boxShadow: `0 25px 60px rgba(0,0,0,0.85), 0 0 0 1px ${theme.primary}25`,
         background: theme.windowBg,
-        backdropFilter: 'blur(28px)',
-        WebkitBackdropFilter: 'blur(28px)',
+        backdropFilter: `blur(${glass?.blur || '28px'})`,
+        WebkitBackdropFilter: `blur(${glass?.blur || '28px'})`,
         transform: mounted ? 'scale(1)' : 'scale(0.94)',
         opacity: mounted ? 1 : 0,
         transition: isDragging

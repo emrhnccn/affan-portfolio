@@ -515,3 +515,31 @@ button:disabled { cursor: not-allowed; opacity: 0.6; }
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Retro CRT Scanline Overlay ──────────────────────────────────────────── */
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.28) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 3px, 6px 100%;
+  opacity: 0.75;
+}
+.crt-overlay::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.45) 100%);
+  pointer-events: none;
+}
+

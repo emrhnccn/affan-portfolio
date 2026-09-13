@@ -128,19 +128,19 @@ export default function Taskbar({ windows, apps, onOpenApp, onToggleMinimize, mu
           flexShrink: 0, paddingLeft: '8px',
           borderLeft: '1px solid rgba(255,255,255,0.08)',
         }}>
-          {/* Status: Available for Work */}
+          {/* Status: Available for Opportunities */}
           <div className="taskbar-stat" style={{
             display: 'flex', alignItems: 'center', gap: '6px',
             padding: '4px 8px', borderRadius: '6px',
             background: 'rgba(52, 211, 153, 0.08)',
             border: '1px solid rgba(52, 211, 153, 0.25)',
-          }} title="İş tekliflerine ve yeni projelere açık">
+          }} title="Available for Opportunities">
             <span style={{
               width: '6px', height: '6px', borderRadius: '50%',
               background: '#34d399', boxShadow: '0 0 6px #34d399'
             }} />
             <span style={{ color: '#34d399', fontSize: '10px', fontFamily: 'monospace', fontWeight: 700 }}>
-              AKTİF · İŞE AÇIK
+              YENİ FIRSATLARA AÇIK
             </span>
           </div>
 

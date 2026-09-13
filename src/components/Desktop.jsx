@@ -190,7 +190,7 @@ function ContextMenu({ x, y, onClose, onOpenApp, APP_LIST, theme }) {
 
 // ─── Main Desktop Component ──────────────────────────────────────────────────
 export default function Desktop() {
-  const { theme, wallpaper } = useTheme();
+  const { theme, wallpaper, crtEffect } = useTheme();
   const [muted, setMuted] = useState(false);
   const { play } = useSounds(muted);
 
@@ -364,6 +364,9 @@ export default function Desktop() {
       {/* Dynamic Wallpaper Layer */}
       <WallpaperLayer wallpaper={wallpaper} theme={theme} />
 
+      {/* Retro CRT Scanline Overlay */}
+      {crtEffect && <div className="crt-overlay" aria-hidden="true" />}
+
       {/* Desktop Watermark */}
       <div style={{
         position: 'absolute', bottom: '60px', right: '20px',
@@ -388,9 +391,9 @@ export default function Desktop() {
       <section className="command-center" aria-labelledby="portfolio-title">
         <div className="command-center__top">
           <span className="command-center__eyebrow">PORTFOLYO · 2026</span>
-          <div className="command-center__status-badge">
+          <div className="command-center__status-badge" title="Available for Opportunities">
             <span className="command-center__pulse" />
-            <span>İŞ TEKLİFLERİNE AÇIK</span>
+            <span>YENİ FIRSATLARA AÇIK</span>
           </div>
         </div>
 

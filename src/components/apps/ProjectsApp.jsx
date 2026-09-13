@@ -13,32 +13,34 @@ import {
   Star,
   Lock,
   Layers,
+  ShoppingBag,
+  Terminal as TermIcon,
 } from 'lucide-react';
 
 const PROJECTS = [
-  // ── FEATURED PROJECTS (TOP 3) ──────────────────────────────────────────────
+  // ── AMİRAL GEMİSİ PROJELER (FLAGSHIP REPOSITORIES) ──────────────────────────
   {
     id: 1,
-    name: 'real-time-chat',
+    name: 'RealTimeChat',
     tier: 'featured',
     category: 'web',
-    title: 'Gerçek Zamanlı Mesajlaşma Mimarisi',
-    subtitle: 'Düşük Gecikmeli Socket.io Altyapısı',
-    desc: 'Node.js ve WebSocket (Socket.io) tabanlı, oda bazlı mesajlaşma ve MongoDB oturum kalıcılığı sağlayan iletişim sistemi.',
-    problem: 'Geleneksel HTTP polling sistemlerinin oluşturduğu gecikme ve sunucu yükünü ortadan kaldırmak; binlerce anlık kullanıcının oda bazında hatasız iletişim kurmasını sağlamak.',
-    solution: 'Event-driven WebSocket mimarisi kuruldu. Kullanıcılar dinamik odalara (rooms) abone edilerek yük optimize edildi. Bağlantı kopmalarına karşı otomatik yeniden bağlanma ve mesajlaşma kuyruğu modellendi.',
+    title: 'RealTimeChat — Gerçek Zamanlı Mesajlaşma',
+    subtitle: 'WebSocket & Socket.io Düşük Gecikmeli Sohbet Altyapısı',
+    desc: 'Node.js ve Socket.io tabanlı, kanal ve oda multiplexing yeteneğine sahip, MongoDB oturum kalıcılığı sağlayan yüksek performanslı mesajlaşma altyapısı.',
+    problem: 'Geleneksel HTTP polling mimarilerinin yol açtığı gecikme ve sunucu CPU darboğazlarını ortadan kaldırmak; binlerce eşzamanlı kullanıcının oda bazında hatasız iletişim kurmasını sağlamak.',
+    solution: 'Event-driven WebSocket mimarisi kuruldu. Kullanıcılar dinamik odalara (rooms) abone edilerek ağ trafiği izole edildi. Bağlantı kesintilerinde otomatik yeniden bağlanma ve mesajlaşma kuyruğu modellendi.',
     highlights: [
-      'Socket.io room multiplexing ile kanal bazlı izolasyon',
-      'MongoDB üzerinde indeksli mesaj geçmişi ve TTL koleksiyonları',
-      'XSS saldırılarına karşı sanitize edilmiş payload doğrulaması',
-      'Mobil uyumlu Tailwind CSS arayüzü ve bildirim sesleri',
+      'Socket.io room multiplexing ile kanal bazlı izolasyon ve düşük gecikme (<50ms)',
+      'MongoDB üzerinde indekslenmiş mesaj geçmişi ve optimize TTL koleksiyonları',
+      'XSS saldırılarına karşı sanitize edilmiş payload ve oturum validasyonu',
+      'Mobil uyumlu responsive arayüz ve Web Audio API bildirim tonları',
     ],
-    tags: ['Node.js', 'Socket.io', 'MongoDB', 'Express', 'Tailwind CSS'],
+    tags: ['Node.js', 'Socket.io', 'WebSocket', 'MongoDB', 'Express', 'Tailwind CSS'],
     icon: MessageSquare,
     iconColor: '#00F5FF',
     image: '/images/proje1.webp',
-    github: null,
-    repoStatus: 'Özel Depo (Private Repo)',
+    github: 'https://github.com/emrhnccn/RealTimeChat',
+    repoStatus: 'Açık Kaynak (Public)',
     liveDemo: null,
   },
   {
@@ -46,18 +48,18 @@ const PROJECTS = [
     name: 'GustoPos',
     tier: 'featured',
     category: 'web',
-    title: 'GustoPos & Restoran Yönetim Sistemi',
-    subtitle: 'Kapasite, Rezervasyon ve POS Otomasyonu',
-    desc: 'React ve TypeScript ile geliştirilmiş restoran POS, masa doluluk ve anlık sipariş yönetim sistemi.',
-    problem: 'Restoran ve kafelerde masa rezervasyonu çakışmaları, sipariş takibi hataları ve anlık ciro/doluluk analitiğinin dağınık yürütülmesi.',
+    title: 'GustoPos — Restoran & POS Yönetim Sistemi',
+    subtitle: 'TypeScript Tabanlı Masa, Sipariş ve Ciro Otomasyonu',
+    desc: 'Restoran ve kafe işletmeleri için geliştirilmiş modern POS sistemi. Masa bazlı sipariş takibi, dinamik rezervasyon haritası ve analitik ciro raporları sunar.',
+    problem: 'Restoran operasyonlarında sipariş çakışmaları, masa doluluğunun manuel takibinden doğan servis gecikmeleri ve dağınık ciro kayıtları.',
     solution: 'TypeScript tip güvenliğiyle geliştirilen merkezi bir yönetim paneli. Masa durumu renk kodlarıyla dinamik izlenir; siparişler ve rezervasyonlar algoritmik olarak kuyruğa alınır.',
     highlights: [
-      'TypeScript ile katı tip güvenliği ve modüler durum yönetimi',
-      'Dinamik masa haritası ve gerçek zamanlı doluluk durumu takibi',
+      'TypeScript ile uçtan uca tip güvenliği ve modüler bileşen durum yönetimi',
+      'Dinamik interaktif masa haritası ve gerçek zamanlı doluluk durumu takibi',
       'Rezervasyon çakışmalarını önleyen algoritmik zaman aralığı kontrolü',
-      'Gelir, sipariş ve masa performansı grafiksel analizleri',
+      'Kapsamlı gelir, sipariş ve masa performansı dashboard analitikleri',
     ],
-    tags: ['TypeScript', 'React', 'Node.js', 'POS Sistemi', 'Dashboard'],
+    tags: ['TypeScript', 'React', 'Node.js', 'POS Mimarisi', 'Dashboard', 'Tailwind'],
     icon: LayoutDashboard,
     iconColor: '#FF00C8',
     image: '/images/proje2.webp',
@@ -67,40 +69,132 @@ const PROJECTS = [
   },
   {
     id: 3,
-    name: 'coop-puzzle',
+    name: 'salas-rezervasyon',
     tier: 'featured',
+    category: 'web',
+    title: 'Salaas Rezervasyon & Masa Yönetim Platformu',
+    subtitle: 'Canlı İşletme Rezervasyon ve Kapasite Planlama Motoru',
+    desc: 'Aktif kafe & restoran işletmesi için canlı üretim ortamına alınan, online masa rezervasyonu ve kapasite planlama platformu.',
+    problem: 'İşletmede telefon ve manuel defterle tutulan rezervasyonların çakışması, no-show oranları ve masa verimsizliği.',
+    solution: 'Müşterilerin doğrudan masa seçebildiği, rezervasyon zaman aralığını ve doluluk oranlarını anlık doğrulayan modern web servisi.',
+    highlights: [
+      'Canlı üretim ortamında (Production) aktif müşteri kullanımı',
+      'Masa kapasitesi ve saat dilimlerine göre anlık çakışma kontrolü',
+      'Mobil cihazlarda hızlı rezervasyon için optimize edilmiş responsive UI',
+    ],
+    tags: ['React', 'Node.js', 'Algoritmik Planlama', 'Express', 'Canlı Üretim'],
+    icon: LayoutDashboard,
+    iconColor: '#34d399',
+    image: '/images/proje3.webp',
+    github: 'https://github.com/emrhnccn/salas-rezervasyon',
+    repoStatus: 'Açık Kaynak (Public)',
+    liveDemo: 'https://salaascaferestaurant.com.tr',
+  },
+  {
+    id: 4,
+    name: 'ersa-ticaret',
+    tier: 'featured',
+    category: 'web',
+    title: 'Ersa Ticaret — Modern B2B & E-Ticaret Platformu',
+    subtitle: 'Ürün Kataloğu, Sipariş Yönetimi ve Sepet Mimarisi',
+    desc: 'Geniş ürün gamına sahip ticari işletmeler için geliştirilmiş, kategori filtreleme, dinamik sepet ve sipariş akışına sahip e-ticaret platformu.',
+    problem: 'Geniş ürün kataloglarında arama ve filtreleme gecikmeleri, karmaşık varyantlar ve mobil cihazlarda hantal kalan sepet deneyimi.',
+    solution: 'React ve Node.js mimarisi üzerinde hafif, hızlı yüklenen, anlık istemci tarafı filtreleme ve güvenli sipariş oluşturma pipeline\'ı kuruldu.',
+    highlights: [
+      'Modüler ürün arama, çoklu filtreleme ve kategori hiyerarşisi',
+      'Persistent sepet yönetimi ve hatasız sipariş özeti akışı',
+      'Lighthouse performans standartlarına uygun hızlı sayfa yüklemesi',
+    ],
+    tags: ['React', 'Node.js', 'E-Ticaret', 'State Management', 'REST API'],
+    icon: ShoppingBag,
+    iconColor: '#facc15',
+    image: '/images/proje6.webp',
+    github: 'https://github.com/emrhnccn/ersa-ticaret',
+    repoStatus: 'Açık Kaynak (Public)',
+    liveDemo: null,
+  },
+  {
+    id: 5,
+    name: 'ersasogutma',
+    tier: 'featured',
+    category: 'web',
+    title: 'Ersa Soğutma — Endüstriyel Soğutma Sistemleri',
+    subtitle: 'Kurumsal Mühendislik Vitrini, Ürün Kataloğu ve Teknik SEO',
+    desc: 'Endüstriyel soğutma sistemleri ve iklimlendirme teknolojileri alanında faaliyet gösteren kurumsal firma için geliştirilmiş yüksek performanslı web platformu.',
+    problem: 'Endüstriyel ürün gruplarının ve teknik şartnamelerin arama motorlarında doğru indekslenememesi ve kurumsal güvenin zayıf temsil edilmesi.',
+    solution: 'Temiz semantic HTML5, modern CSS ve teknik SEO mimarisiyle sıfır CLS ve yüksek PageSpeed skorlarına sahip kurumsal mühendislik vitrini.',
+    highlights: [
+      'Endüstriyel ürün grupları ve teknik spesifikasyon sunumu',
+      'Teknik SEO optimizasyonu ve Schema.org kurumsal yapılandırılmış verisi',
+      'Mobil acil servis ve teklif alma kanalları entegrasyonu',
+    ],
+    tags: ['HTML5', 'Modern CSS', 'JavaScript', 'Teknik SEO', 'Kurumsal Mimari'],
+    icon: Globe,
+    iconColor: '#38bdf8',
+    image: '/images/proje4.webp',
+    github: 'https://github.com/emrhnccn/ersasogutma',
+    repoStatus: 'Açık Kaynak (Public)',
+    liveDemo: null,
+  },
+  {
+    id: 6,
+    name: 'affan-portfolio',
+    tier: 'featured',
+    category: 'web',
+    title: 'AffanOS — Developer Operating System Portfolio',
+    subtitle: 'React 19, Pointer Events & Özel Pencere Yöneticisi',
+    desc: 'Geliştiricinin tüm projelerini, yeteneklerini ve deneyimini yaşayan bir işletim sistemi metaforuyla sunan modern web mimarisi.',
+    problem: 'Standart statik portföylerin geliştiricinin sistem tasarımı, durum yönetimi ve etkileşimli yazılım yetkinliğini yansıtamaması.',
+    solution: 'Pointer Events ile dokunmatik/fare destekli pencere yöneticisi, dinamik tema motoru, Web Audio API ses sentezi, mobil-first shell ve %100 erişilebilirlik (WCAG).',
+    highlights: [
+      'React 19 ve Vite ile modern SPA mimarisi, 100/100 Lighthouse erişilebilirlik',
+      'Pointer Events ve Viewport Boundary Clamping ile kusursuz pencere sürükleme',
+      'Masaüstü ve mobil ekranlar için iki ayrı optimize edilmiş deneyim katmanı',
+      'Web Audio API ile dosyasız gerçek zamanlı ses sentezi ve kişiselleştirme',
+    ],
+    tags: ['React 19', 'Pointer Events', 'Modern Web OS', 'Design Tokens', 'Web Audio'],
+    icon: TermIcon,
+    iconColor: '#00F5FF',
+    image: '/images/og-preview.png',
+    github: 'https://github.com/emrhnccn/affan-portfolio',
+    repoStatus: 'Açık Kaynak (Public)',
+    liveDemo: 'https://affan-portfolio-gilt.vercel.app/',
+  },
+
+  // ── SELECTED & SPECIALIZED PROJECTS ─────────────────────────────────────────
+  {
+    id: 7,
+    name: 'coop-puzzle',
+    tier: 'selected',
     category: 'game',
     title: '3D Co-op Bulmaca Oyunu',
-    subtitle: 'Eşzamanlı Fizik ve Etkileşim Motoru',
-    desc: 'Unity 3D ve C# ile geliştirilmiş iki oyunculu co-op bulmaca oyunu. Rigidbody fiziği ve raycast senkronizasyonu içerir.',
-    problem: 'İki karakterin eşzamanlı olarak aynı fiziksel objeler üzerinde kuvvet uygulaması ve senkronize bulmacaları çözmesi sırasında oluşan desync ve bellek darboğazları.',
+    subtitle: 'Unity 3D, C# Eşzamanlı Fizik ve Etkileşim Motoru',
+    desc: 'Unity 3D ile geliştirilmiş iki oyunculu co-op bulmaca oyunu. Rigidbody fiziği, raycast etkileşimleri ve karakter senkronizasyonu içerir.',
+    problem: 'İki karakterin eşzamanlı olarak aynı fiziksel objeler üzerinde kuvvet uygulaması ve senkronize bulmacaları çözmesi sırasında oluşan bellek darboğazları.',
     solution: 'C# Clean Code prensipleriyle nesne havuzu (Object Pooling) ve optimize edilmiş Raycast etkileşimleri geliştirildi. Garbage Collection yükü minimize edildi.',
     highlights: [
       'Custom Rigidbody fizik mekanikleri ve dinamik ağırlık dengesi',
       'Bellek optimizasyonu: Object Pooling ile sıfır frame-drop',
       'Modular Interaction System (Butonlar, lazerler, ağırlık tablaları)',
-      'Unity Animator State Machine ve ses senkronizasyonu',
     ],
     tags: ['Unity 3D', 'C#', 'Fizik Motoru', 'Object Pooling', 'Level Design'],
     icon: Gamepad2,
-    iconColor: '#00F5FF',
+    iconColor: '#c084fc',
     image: '/images/proje4.webp',
     github: null,
     repoStatus: 'Özel Mülkiyet (Private Repo)',
     liveDemo: null,
   },
-
-  // ── SELECTED PROJECTS ───────────────────────────────────────────────────────
   {
-    id: 4,
+    id: 8,
     name: 'kyk-automation',
     tier: 'selected',
     category: 'web',
     title: 'KYK Yurt Otomasyonu & Kapasite Takibi',
-    subtitle: 'İlişkisel Veritabanı & Algoritmik Oda Atama',
+    subtitle: 'İlişkisel Veritabanı (MySQL 3NF) & Algoritmik Oda Atama',
     desc: 'MySQL ve Node.js üzerine kurulu, öğrenci kayıt, oda atama, yemekhane hakkı ve kapasite takibini yöneten sistem.',
     problem: 'Yurtlarda manuel yapılan oda yerleşimleri, kapasite aşımları ve yemekhane haklarının takibindeki insan hataları.',
-    solution: '3. Normal Form (3NF) kurallarına uygun ilişkisel MySQL şeması ve algoritmik oda atama servisi geliştirildi.',
+    solution: '3. Normal Form (3NF) kurallarına uygun ilişkisel MySQL şeması ve kontenjan bazlı algoritmik oda atama servisi geliştirildi.',
     highlights: [
       'Kompleks MySQL Foreign Key ve Indexleme optimizasyonu',
       'Öğrenci kontenjanı ve oda tiplerine göre otomatik yerleşim algoritması',
@@ -115,12 +209,12 @@ const PROJECTS = [
     liveDemo: null,
   },
   {
-    id: 5,
+    id: 9,
     name: 'match3-game',
     tier: 'selected',
     category: 'game',
     title: 'Kampüs Temalı Match-3 Oyunu',
-    subtitle: 'Bitirme Projesi & Blender 3D Entegrasyonu',
+    subtitle: 'Üniversite Bitirme Projesi & Blender 3D Entegrasyonu',
     desc: 'Blender ile modellenen kampüs binalarının Unity\'ye dinamik harita olarak aktarıldığı, Match-3 algoritmalarına sahip oyun.',
     problem: 'Geleneksel 2D Match-3 oyunları yerine kampüs yaşamını tanıtan 3D interaktif harita ve oyun mekaniği üretmek.',
     solution: 'Blender 3D modelleri Unity içerisine low-poly olarak aktarıldı. Grid tabanlı eşleştirme algoritması ve backend leaderboard API entegre edildi.',
@@ -138,12 +232,12 @@ const PROJECTS = [
     liveDemo: null,
   },
   {
-    id: 6,
+    id: 10,
     name: 'ai-automation',
     tier: 'selected',
     category: 'ai',
     title: 'AI İçerik & Veri Otomasyonları',
-    subtitle: 'LLM API & Web Scraping Pipeline',
+    subtitle: 'LLM API Entegrasyonu & Web Scraping Pipeline',
     desc: 'LLM API entegrasyonu ile dinamik içerik üreten ve Web Scraping botlarıyla yapılandırılmış veri toplayan otomasyon araçları.',
     problem: 'Manuel veri toplama ve içerik üretim süreçlerinin çok zaman alması ve hataya açık olması.',
     solution: 'Node.js üzerinde zamanlanmış botlar ve LLM API pipeline\'ları kuruldu. Ham veriler yapılandırılmış JSON formatına dönüştürüldü.',
@@ -159,91 +253,6 @@ const PROJECTS = [
     github: null,
     repoStatus: 'Ar-Ge Projesi (R&D)',
     liveDemo: null,
-  },
-  {
-    id: 7,
-    name: 'pendikcekici',
-    tier: 'selected',
-    category: 'web',
-    title: 'Pendik Çekici Hizmetleri',
-    subtitle: 'Teknik SEO & Core Web Vitals Odaklı Web',
-    desc: 'İstanbul Pendik bölgesine özel çekici ve yol yardım hizmeti sunan SEO ve hız odaklı kurumsal web platformu.',
-    problem: 'Yerel arama motoru sorgularında düşük hız ve eksik teknik SEO nedeniyle müşteriye ulaşamama sorunu.',
-    solution: 'Temiz semantic HTML5, kritik CSS inlining ve optimize varlıklarla Google PageSpeed 100/100 performansı elde edildi.',
-    highlights: [
-      'Core Web Vitals skorlarında sıfır CLS ve 0.8s altı LCP',
-      'Local Business Schema JSON-LD zengin veri entegrasyonu',
-      'Mobil acil çağrı düğmeleri ve WhatsApp yönlendirme',
-    ],
-    tags: ['HTML5', 'CSS3', 'Teknik SEO', 'PageSpeed 100', 'Schema.org'],
-    icon: Globe,
-    iconColor: '#00F5FF',
-    image: null,
-    github: 'https://github.com/emrhnccn/pendikcekici',
-    repoStatus: 'Açık Kaynak (Public)',
-    liveDemo: 'https://pendikcekici.vercel.app',
-  },
-
-  // ── ARCHIVE & EXPERIMENTS ──────────────────────────────────────────────────
-  {
-    id: 8,
-    name: 'aiflix',
-    tier: 'archive',
-    category: 'ai',
-    title: 'AIFlix — Yapay Zeka Öneri Prototipi',
-    subtitle: 'Akıllı İçerik Keşif Platformu',
-    desc: 'Modern video akış servislerinden ilham alan, yapay zekâ tabanlı içerik öneri algoritması prototipi.',
-    problem: 'Geniş medya kataloglarında kullanıcının zevkine uygun içerik bulma zorluğu.',
-    solution: 'React ve TypeScript ile geliştirilen arayüz, izleme geçmişine göre ağırlıklandırılmış öneriler sunar.',
-    highlights: [
-      'Modern UI/UX streaming arayüz tasarımı',
-      'Kullanıcı tercih vektörlerine dayalı basit öneri motoru',
-    ],
-    tags: ['React', 'TypeScript', 'AI Öneri', 'UI Tasarımı'],
-    icon: Monitor,
-    iconColor: '#00F5FF',
-    image: null,
-    github: 'https://github.com/emrhnccn/aiflix',
-    repoStatus: 'Açık Kaynak (Public)',
-    liveDemo: null,
-  },
-  {
-    id: 9,
-    name: 'BereketSisesiGit',
-    tier: 'archive',
-    category: 'web',
-    title: 'Bereket Sesi (v1)',
-    subtitle: 'Kurumsal Web & Marka Platformu',
-    desc: 'Bereket Sesi markasının ilk versiyon kurumsal web sitesi ve dijital vitrin projesi.',
-    problem: 'Markanın dijital dünyadaki ilk temsilini sade ve hızlı bir yapıyla kurmak.',
-    solution: 'Hafif frontend altyapısı ve marka kimliğine uygun kurumsal sunum.',
-    highlights: ['Minimalist tasarım', 'Hızlı sayfa yükleme', 'Responsive uyumluluk'],
-    tags: ['Web Sitesi', 'Kurumsal', 'Marka Kimliği', 'Vercel'],
-    icon: Globe,
-    iconColor: '#FF00C8',
-    image: null,
-    github: null,
-    repoStatus: 'Özel Depo (Private Repo)',
-    liveDemo: 'https://bereketsisesi.vercel.app',
-  },
-  {
-    id: 10,
-    name: 'restaurant-system',
-    tier: 'archive',
-    category: 'web',
-    title: 'Salaas Kafe & Restoran Web Portalı',
-    subtitle: 'Canlı Müşteri Rezervasyon & Menü Platformu',
-    desc: 'Aktif işletme için geliştirilmiş, dinamik menü ve rezervasyon iletişim altyapısına sahip canlı web sitesi.',
-    problem: 'Müşterilerin işletme menüsüne ve rezervasyon iletişimine anlık erişebilmesi.',
-    solution: 'Modern web standartlarında geliştirilip canlı yayına alınan stabil kurumsal platform.',
-    highlights: ['Canlı üretim ortamında aktif kullanım', 'Mobil odaklı arayüz', 'Hızlı menü navigasyonu'],
-    tags: ['React', 'Web Geliştirme', 'Canlı Proje', 'Restoran'],
-    icon: LayoutDashboard,
-    iconColor: '#00F5FF',
-    image: null,
-    github: null,
-    repoStatus: 'Kurumsal Mülkiyet (Client Project)',
-    liveDemo: 'https://salaascaferestaurant.com.tr',
   },
 ];
 
@@ -271,7 +280,7 @@ function ProjectDetail({ project, onBack }) {
 
       {/* Hero Header / Banner */}
       <div style={{
-        height: '200px', borderRadius: '12px', overflow: 'hidden',
+        height: '210px', borderRadius: '12px', overflow: 'hidden',
         marginBottom: '22px', position: 'relative',
         background: project.image ? '#0a0a14' : 'linear-gradient(135deg, #0d0d20 0%, #170d2e 100%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -306,19 +315,19 @@ function ProjectDetail({ project, onBack }) {
         <div style={{
           position: 'absolute', top: '16px', right: '16px',
           display: 'flex', alignItems: 'center', gap: '6px',
-          padding: '4px 10px', borderRadius: '20px',
+          padding: '4px 12px', borderRadius: '20px',
           background: project.tier === 'featured' ? 'rgba(0,245,255,0.2)' : 'rgba(255,255,255,0.1)',
-          border: project.tier === 'featured' ? '1px solid rgba(0,245,255,0.4)' : '1px solid rgba(255,255,255,0.15)',
+          border: project.tier === 'featured' ? '1px solid rgba(0,245,255,0.45)' : '1px solid rgba(255,255,255,0.15)',
           color: project.tier === 'featured' ? '#00F5FF' : '#cbd5e1',
-          fontSize: '11px', fontFamily: 'monospace', fontWeight: 600,
+          fontSize: '11px', fontFamily: 'monospace', fontWeight: 700,
           backdropFilter: 'blur(10px)',
         }}>
           {project.tier === 'featured' && <Star size={12} fill="#00F5FF" aria-hidden="true" />}
-          {project.tier === 'featured' ? 'ÖNE ÇIKAN PROJE' : project.tier === 'selected' ? 'SEÇİLİ PROJE' : 'ARŞİV & PROTOTİP'}
+          {project.tier === 'featured' ? 'AMİRAL GEMİSİ PROJE' : 'SEÇİLİ MÜHENDİSLİK PROJESİ'}
         </div>
       </div>
 
-      <div style={{ marginBottom: '6px', color: project.iconColor, fontFamily: 'monospace', fontSize: '12px', fontWeight: 700 }}>
+      <div style={{ marginBottom: '6px', color: project.iconColor, fontFamily: 'monospace', fontSize: '12.5px', fontWeight: 700 }}>
         {project.subtitle}
       </div>
 
@@ -348,7 +357,7 @@ function ProjectDetail({ project, onBack }) {
           <div style={{ color: '#f87171', fontSize: '11px', fontFamily: 'monospace', fontWeight: 700, marginBottom: '6px' }}>
             // PROBLEM TANIMI
           </div>
-          <p style={{ color: '#cbd5e1', fontSize: '13px', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ color: '#cbd5e1', fontSize: '13px', lineHeight: 1.65, margin: 0 }}>
             {project.problem}
           </p>
         </div>
@@ -360,7 +369,7 @@ function ProjectDetail({ project, onBack }) {
           <div style={{ color: '#34d399', fontSize: '11px', fontFamily: 'monospace', fontWeight: 700, marginBottom: '6px' }}>
             // MİMARİ VE ÇÖZÜM
           </div>
-          <p style={{ color: '#cbd5e1', fontSize: '13px', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ color: '#cbd5e1', fontSize: '13px', lineHeight: 1.65, margin: 0 }}>
             {project.solution}
           </p>
         </div>
@@ -473,7 +482,7 @@ export default function ProjectsApp() {
         <div style={{ display: 'flex', gap: '6px', overflowX: 'auto' }}>
           {[
             { id: 'all', label: 'Tümü (10)' },
-            { id: 'featured', label: '⭐ Öne Çıkanlar (3)' },
+            { id: 'featured', label: '⭐ Amiral Gemisi (6)' },
             { id: 'web', label: 'Web & Full-Stack' },
             { id: 'game', label: 'Unity & Oyun' },
             { id: 'ai', label: 'AI & Veri' },
@@ -551,10 +560,10 @@ export default function ProjectsApp() {
                   <span style={{
                     display: 'inline-flex', alignItems: 'center', gap: '4px',
                     padding: '3px 8px', borderRadius: '20px',
-                    background: 'rgba(0,245,255,0.15)', border: '1px solid rgba(0,245,255,0.3)',
+                    background: 'rgba(0,245,255,0.15)', border: '1px solid rgba(0,245,255,0.35)',
                     color: '#00F5FF', fontSize: '10px', fontFamily: 'monospace', fontWeight: 700,
                   }}>
-                    <Star size={10} fill="#00F5FF" aria-hidden="true" /> ÖNE ÇIKAN
+                    <Star size={10} fill="#00F5FF" aria-hidden="true" /> AMİRAL GEMİSİ
                   </span>
                 ) : (
                   <span style={{
@@ -566,7 +575,7 @@ export default function ProjectsApp() {
               </div>
 
               {/* Title & Subtitle */}
-              <div style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff', marginBottom: '4px' }}>
+              <div style={{ fontSize: '14.5px', fontWeight: 700, color: '#ffffff', marginBottom: '4px' }}>
                 {project.title}
               </div>
               <div style={{ fontSize: '11.5px', color: project.iconColor, fontFamily: 'monospace', marginBottom: '8px' }}>

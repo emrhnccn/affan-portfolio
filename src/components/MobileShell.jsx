@@ -40,7 +40,9 @@ export default function MobileShell({ apps, onOpenApp, onMuteToggle, muted }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34d399', boxShadow: '0 0 6px #34d399' }} />
-            <span style={{ fontSize: '10px', color: '#34d399' }}>İŞE AÇIK</span>
+            <span style={{ fontSize: '10px', color: '#34d399', fontWeight: 600 }} title="Available for Opportunities">
+              YENİ FIRSATLARA AÇIK
+            </span>
           </div>
           <button
             type="button"

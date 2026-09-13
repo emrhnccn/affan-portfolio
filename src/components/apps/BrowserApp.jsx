@@ -17,12 +17,14 @@ function isBlockedDomain(url) {
 }
 
 const BOOKMARKS = [
-  { label: 'GitHub',   url: 'https://github.com/emrhnccn',                  icon: '🐙' },
-  { label: 'LinkedIn', url: 'https://linkedin.com/in/affanccn',              icon: '💼' },
-  { label: 'Bereket',  url: 'https://bereketsisesi.vercel.app',               icon: '🌐' },
-  { label: 'Salaas',   url: 'https://salaascaferestaurant.com.tr',            icon: '🍽️' },
-  { label: 'GustoPos', url: 'https://gusto-pos-two.vercel.app',               icon: '🖥️' },
-  { label: 'Pendik',   url: 'https://pendikcekici.vercel.app',                icon: '🚗' },
+  { label: 'GustoPos',     url: 'https://gusto-pos-two.vercel.app',         icon: '🖥️' },
+  { label: 'Salaas',       url: 'https://salaascaferestaurant.com.tr',      icon: '🍽️' },
+  { label: 'RealTimeChat', url: 'https://github.com/emrhnccn/RealTimeChat',  icon: '💬' },
+  { label: 'Ersa Ticaret', url: 'https://github.com/emrhnccn/ersa-ticaret',  icon: '🛍️' },
+  { label: 'Ersa Soğutma', url: 'https://github.com/emrhnccn/ersasogutma',   icon: '❄️' },
+  { label: 'AffanOS',      url: 'https://affan-portfolio-gilt.vercel.app/', icon: '💻' },
+  { label: 'GitHub',       url: 'https://github.com/emrhnccn',              icon: '🐙' },
+  { label: 'LinkedIn',     url: 'https://linkedin.com/in/affanccn',          icon: '💼' },
 ];
 
 const HOME_URL = 'affanos://homepage';
@@ -99,12 +101,14 @@ function BlockedPage({ url, theme }) {
 // ── Homepage ──────────────────────────────────────────────────────────────────
 function HomeDashboard({ theme, onNavigate }) {
   const quickLinks = [
-    { label: 'Bereket Sesi',      url: 'https://bereketsisesi.vercel.app',    icon: '🌐' },
-    { label: 'Salaas Restoran',   url: 'https://salaascaferestaurant.com.tr', icon: '🍽️' },
-    { label: 'GustoPos POS',      url: 'https://gusto-pos-two.vercel.app',    icon: '🖥️' },
-    { label: 'Pendik Çekici',     url: 'https://pendikcekici.vercel.app',     icon: '🚗' },
-    { label: 'GitHub Profili',    url: 'https://github.com/emrhnccn',         icon: '🐙' },
-    { label: 'LinkedIn Profili',  url: 'https://linkedin.com/in/affanccn',    icon: '💼' },
+    { label: 'GustoPos POS',      url: 'https://gusto-pos-two.vercel.app',        icon: '🖥️' },
+    { label: 'Salaas Rezervasyon',url: 'https://salaascaferestaurant.com.tr',     icon: '🍽️' },
+    { label: 'RealTimeChat',      url: 'https://github.com/emrhnccn/RealTimeChat', icon: '💬' },
+    { label: 'Ersa Ticaret',      url: 'https://github.com/emrhnccn/ersa-ticaret', icon: '🛍️' },
+    { label: 'Ersa Soğutma',      url: 'https://github.com/emrhnccn/ersasogutma',  icon: '❄️' },
+    { label: 'AffanOS Portföy',   url: 'https://affan-portfolio-gilt.vercel.app/',icon: '💻' },
+    { label: 'GitHub Profili',    url: 'https://github.com/emrhnccn',             icon: '🐙' },
+    { label: 'LinkedIn Profili',  url: 'https://linkedin.com/in/affanccn',         icon: '💼' },
   ];
 
   return (
@@ -374,7 +378,7 @@ export default function BrowserApp({ initialUrl = HOME_URL }) {
             value={inputUrl}
             onChange={e => setInputUrl(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="URL gir veya ara... (örn: bereketsisesi.vercel.app)"
+            placeholder="URL gir veya ara... (örn: gusto-pos-two.vercel.app)"
             style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: '#e2e8f0', fontSize: '12px', cursor: 'text' }}
           />
           {loading && (
